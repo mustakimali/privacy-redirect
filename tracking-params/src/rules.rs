@@ -5,17 +5,17 @@
 //!
 //! https://github.com/dczysz/tracking-params/blob/5ccb3f8e3d4d6f3dfb88abe85a304fb78cfa41ce/src/params.ts
 use crate::{
-    Param,
+    Rule,
     M::{self, Any, Contains, Exact, StartsWith},
 };
 
 lazy_static::lazy_static! {
-    pub(crate) static ref  GLOBAL_PARAMS: Vec<Param> = vec![
-        Param {
+    pub(crate) static ref  GLOBAL_PARAMS: Vec<Rule> = vec![
+        Rule {
             domains: vec![Any],
             params: UNIVERSAL_PARAMS.to_vec(),
         },
-        Param {
+        Rule {
             domains: vec![Contains("amazon")],
             params: vec![
                 Exact("_encoding"),
@@ -34,7 +34,7 @@ lazy_static::lazy_static! {
                 Exact("tag"),
             ],
         },
-        Param {
+        Rule {
             domains: vec![Contains("bing")],
             params: vec![
                 Exact("cvid"),
@@ -46,7 +46,7 @@ lazy_static::lazy_static! {
                 Exact("sp"),
             ],
         },
-        Param {
+        Rule {
             domains: vec![Contains("google")],
             params: vec![
                 Exact("cvid"),
@@ -56,20 +56,20 @@ lazy_static::lazy_static! {
                 Exact("ved"),
             ],
         },
-        Param {
+        Rule {
             domains: vec![Contains("instagram")],
             params: vec![
                 Exact("igshid"),
             ],
         },
-        Param {
+        Rule {
             domains: vec![Contains("nytimes")],
             params: vec![
                 Exact("emc"),
                 Exact("partner"),
             ],
         },
-        Param {
+        Rule {
             domains: vec![Contains("reddit")],
             params: vec![
                 Exact("context"),
@@ -78,7 +78,7 @@ lazy_static::lazy_static! {
                 Exact("st"),
             ],
         },
-        Param {
+        Rule {
             domains: vec![Contains("twitter")],
             params: vec![
                 Exact("context"),
@@ -89,7 +89,7 @@ lazy_static::lazy_static! {
                 Exact("ref_url"),
             ],
         },
-        Param {
+        Rule {
             domains: vec![Contains("youtube")],
             params: vec![
                 Contains("ab_channel"),

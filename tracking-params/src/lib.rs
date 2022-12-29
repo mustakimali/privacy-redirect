@@ -1,9 +1,9 @@
 use url::Url;
 
-mod params;
+mod rules;
 
 #[derive(Clone, Debug)]
-pub(crate) struct Param {
+pub(crate) struct Rule {
     domains: Vec<M>,
     params: Vec<M>,
 }
@@ -41,7 +41,7 @@ impl M {
 pub fn clean(url: Url) -> Url {
     // Find applicable rules for this hostname
     let host = url.host_str();
-    let rules = params::GLOBAL_PARAMS
+    let rules = rules::GLOBAL_PARAMS
         .iter()
         .filter(|r| r.domains.iter().any(|d| d.matches_str(host)))
         .collect::<Vec<_>>();
@@ -56,7 +56,7 @@ pub fn clean_str(url: &str) -> Result<String, url::ParseError> {
     Ok(url.to_string())
 }
 
-fn clean_query_string(url: Url, rules: &Vec<&Param>) -> Url {
+fn clean_query_string(url: Url, rules: &Vec<&Rule>) -> Url {
     let mut url = url;
     if url.query().is_none() {
         return url;
@@ -89,7 +89,7 @@ fn clean_query_string(url: Url, rules: &Vec<&Param>) -> Url {
     return params.finish().to_owned();
 }
 
-fn clean_hash_params(url: Url, rules: &Vec<&Param>) -> Url {
+fn clean_hash_params(url: Url, rules: &Vec<&Rule>) -> Url {
     let mut url = url;
 
     if let Some(f) = url.fragment() {
