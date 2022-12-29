@@ -47,6 +47,7 @@ a {
   text-align: left;
   padding: 20px;
   background-color: #888;
+  overflow-x: scroll;
 }
 
 h1 {
