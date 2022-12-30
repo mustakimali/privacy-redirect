@@ -1,8 +1,8 @@
 [package]
 name = "tracking-params"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
-description = "Removes unwanted tracking paramters from URLs"
+description = "Removes unwanted tracking parameters from URLs"
 documentation = "https://docs.rs/tracking-params"
 readme = "README.md"
 license = "MIT OR Apache-2.0"

@@ -1,6 +1,6 @@
 //! # tracking-params
 //!
-//! Removes unwanted tracking paramters from a given URLs.
+//! Removes unwanted tracking parameters from a given URLs.
 //!
 //! ```rust
 //! let dirty_url = url::Url::parse("https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY").unwrap();

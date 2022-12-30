@@ -1646,7 +1646,7 @@ dependencies = [
 
 [[package]]
 name = "tracking-params"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "lazy_static",
  "test-case",
