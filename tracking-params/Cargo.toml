@@ -1,6 +1,6 @@
 [package]
 name = "tracking-params"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Removes unwanted tracking paramters from URLs"
 documentation = "https://docs.rs/tracking-params"
