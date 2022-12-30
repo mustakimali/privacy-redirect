@@ -38,7 +38,33 @@ impl M {
     }
 }
 
-pub fn clean(url: Url) -> Url {
+/// A cleaned URL.
+///
+///
+/// This is a wrapper around and `Deref` into [`url::Url`] that also overriedes the `ToString`
+/// to prevent extra `=` at the end of the URL when the query string does
+/// not have any value.
+///
+/// eg.`https://example.com/?json` turns to `https://example.com/?json=` when
+/// `ToString` is called on the Url type.
+///
+pub struct Cleaned(Url);
+
+impl std::ops::Deref for Cleaned {
+    type Target = Url;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl ToString for Cleaned {
+    fn to_string(&self) -> String {
+        self.0.as_ref().trim_end_matches('=').to_string()
+    }
+}
+
+pub fn clean(url: Url) -> Cleaned {
     // Find applicable rules for this hostname
     let host = url.host_str();
     let rules = rules::GLOBAL_PARAMS
@@ -46,7 +72,7 @@ pub fn clean(url: Url) -> Url {
         .filter(|r| r.domains.iter().any(|d| d.matches_str(host)))
         .collect::<Vec<_>>();
 
-    clean_hash_params(clean_query_string(url, &rules), &rules)
+    Cleaned(clean_hash_params(clean_query_string(url, &rules), &rules))
 }
 
 pub fn clean_str(url: &str) -> Result<String, url::ParseError> {
@@ -84,16 +110,8 @@ fn clean_query_string(url: Url, rules: &Vec<&Rule>) -> Url {
         params.append_pair(k.as_ref(), v.as_ref());
     }
 
-    // Hash Params
-
     return params.finish().to_owned();
 }
-
-// fn decode(inpt: &str) -> String {
-//     urlencoding::decode(inpt)
-//         .map(|r| r.to_string())
-//         .unwrap_or_else(|_| inpt.to_string())
-// }
 
 fn clean_hash_params(url: Url, rules: &Vec<&Rule>) -> Url {
     let mut url = url;
@@ -159,11 +177,11 @@ mod tests {
     )]
     #[test_case(
         "https://twitter.com/elonmusk/status/1608273870901096454?from",
-        "https://twitter.com/elonmusk/status/1608273870901096454?from="; "twitter: single good query without value" // Url crate adds a `=`
+        "https://twitter.com/elonmusk/status/1608273870901096454?from"; "twitter: single good query without value"
     )]
     #[test_case(
         "https://twitter.com/elonmusk/status/1608273870901096454?from&ref_src=abc",
-        "https://twitter.com/elonmusk/status/1608273870901096454?from="; "twitter: bad query with value good query without value" // Url crate adds a `=`
+        "https://twitter.com/elonmusk/status/1608273870901096454?from"; "twitter: bad query with value good query without value"
     )]
     fn query(input: &str, expected: &str) {
         test_common(input, expected)
@@ -213,6 +231,10 @@ mod tests {
     //     "https://href.li/?https://whatsmyreferer.com/?utm_campaign=twsrc^dUmBgUY",
     //     "https://href.li/?https://whatsmyreferer.com/?utm_campaign=twsrc^dUmBgUY"; "misc: href.li"
     // )]
+    #[test_case(
+        "https://whatsmyreferer.com/?json",
+        "https://whatsmyreferer.com/?json"; "misc: no trailing eq ="
+    )]
     fn misc(input: &str, expected: &str) {
         test_common(input, expected)
     }
@@ -220,7 +242,13 @@ mod tests {
     fn test_common(input: &str, expected: &str) {
         let result = clean(Url::parse(input).unwrap()).to_string();
 
-        assert_eq!(result, expected.to_string());
+        assert_eq!(
+            result,
+            expected.to_string(),
+            "\nExpected: `{}`\n   Found: `{}`",
+            expected,
+            result
+        );
     }
 
     #[test]
