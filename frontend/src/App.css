@@ -7,6 +7,10 @@
   pointer-events: none;
 }
 
+h2, p {
+  color: white;
+}
+
 .App-header {
   background-color: #282c34;
   display: flex;
@@ -27,6 +31,7 @@ a {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -36,6 +41,7 @@ a {
   font-size: large;
   word-wrap: break-word;
 }
+
 #host {
   font-weight: bold;
 }

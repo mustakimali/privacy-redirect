@@ -43,35 +43,45 @@ function App() {
       </header>
 
       <div className="content">
-        <p>
-          Use this service to remove all known trackers and hide your referrer before redirecting your visitor to another site.
-        </p>
-        <p>
-          Simply prefix the link with '<code>{SERVER}/?</code>'.
-        </p>
-        <p>
-        Paste a link below to see preview ⚡
-        </p>
-        <input type="text" defaultValue={state.url} onChange={updateResult} placeholder="Paste a link" />
+        <div className="panel">
+          <p>
+            Use this service to remove all known trackers and hide your referrer before redirecting your visitor to another site.
+          </p>
+          <p>
+            Simply prefix the link with '<code>{SERVER}/?</code>'.
+          </p>
+          <p>
+          Paste a link below to see preview ⚡
+          </p>
+          <input type="text" defaultValue={state.url} onChange={updateResult} placeholder="Paste a link" />
 
-        <form>
-          <div style={{ fontSize: 'x-large' }}>
-            <p>
-              <a href={SERVER + '/?' + state.url} target="_blank" className='previewLink'>
-                <span id="host">{SERVER}/</span>?<span id="orgUrl">{state.url}</span>
-              </a>
-            </p>
-          </div>
-          Redirects to:
-          <br/><br/>
-          <input type="text" value={state.cleaned} placeholder="Cleaned link will appear hear" readOnly={true} />
-        </form>
-        <p>
-          If you specify <code>Content-Type: application/json</code> then you get a json response.
-        </p>
-        <pre className='preview'>{ state.json }</pre>
+          <form>
+            <div style={{ fontSize: 'x-large' }}>
+              <p>
+                <a href={SERVER + '/?' + state.url} target="_blank" className='previewLink'>
+                  <span id="host">{SERVER}/</span>?<span id="orgUrl">{state.url}</span>
+                </a>
+              </p>
+            </div>
+            Redirects to:
+            <br/><br/>
+            <input type="text" value={state.cleaned} placeholder="Cleaned link will appear hear" readOnly={true} />
+          </form>
+          <p>
+            If you specify <code>Content-Type: application/json</code> then you get a json response.
+          </p>
+          <pre className='preview'>{ state.json }</pre>
+        </div >
       </div >
-    </div >
+      <div className="panel">
+        <h2>For your website</h2>
+
+        <p>Add the following script in your website</p>
+        <code>
+          &lt;script src="{SERVER}/app/script.js"&gt;&lt;/script&gt;
+        </code>
+      </div>
+    </div>
   );
 }
 

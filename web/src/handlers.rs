@@ -3,6 +3,7 @@ use actix_web::{
     HttpResponse, Responder,
 };
 use serde_json::json;
+use tracing::info;
 
 #[derive(thiserror::Error, Debug)]
 pub enum HttpError {
@@ -28,6 +29,20 @@ pub async fn health() -> impl Responder {
 }
 
 const JSON_CONTENT_TYPE: &[u8] = "application/json".as_bytes();
+
+const REDIRECT_HTML: &str = r#"
+<!DOCTYPE html>
+<html><head>
+<title>Privacy Redirect</title>
+<meta http-equiv="Refresh" content="0; url=$$URL$$" />
+<meta name="referrer" content="no-referrer" />
+<script type="text/javascript">
+/* <![CDATA[ */
+window.location.replace( "$$URL_ESCAPED$$" + window.location.hash );
+/* ]]> */
+</script>
+</head>
+<body style="background-color: black;color: white;"><p>Redirecting..<br /><a href="$$URL$$">$$URL$$</a></p></body></html>"#;
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     let qs = req.query_string().to_string();
     let q = urlencoding::decode(qs.as_str())
@@ -36,6 +51,8 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
 
     if !q.is_empty() {
         if let Ok(cleaned) = tracking_params::clean_str(&q) {
+            info!(dirty = q, cleaned = cleaned, "Cleaned");
+
             if let Some(ct) = req.headers().get("content-type") {
                 if ct
                     .as_bytes()
@@ -53,9 +70,11 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
                         );
                 }
             }
-            return HttpResponse::TemporaryRedirect()
-                .append_header(("Location", cleaned.as_str()))
-                .finish();
+            let cleaned_escaped = cleaned.replace("/", r#"\/"#);
+            let html = REDIRECT_HTML
+                .replace("$$URL$$", &cleaned)
+                .replace("$$URL_ESCAPED$$", &cleaned_escaped);
+            return HttpResponse::Ok().body(html);
         }
     }
 
