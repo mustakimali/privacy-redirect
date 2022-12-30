@@ -42,7 +42,7 @@ window.location.replace( "$$URL_ESCAPED$$" + window.location.hash );
 /* ]]> */
 </script>
 </head>
-<body style="background-color: black;color: white;"><p>Redirecting..<br /><a href="$$URL$$">$$URL$$</a></p></body></html>"#;
+<body style="background-color: black;"><p>Redirecting..<br /><a href="$$URL$$">$$URL$$</a></p></body></html>"#;
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     let qs = req.query_string().to_string();
     let q = urlencoding::decode(qs.as_str())
