@@ -1,3 +1,16 @@
+//! # tracking-params
+//!
+//! Removes unwanted tracking paramters from a given URLs.
+//!
+//! ```rust
+//! let dirty_url = url::Url::parse("https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY").unwrap();
+//! let clean_url = tracking_params::clean(dirty_url); // returns `Cleaned` which derefs to `url::Url`
+//!
+//! assert_eq!(
+//!     clean_url.to_string(),
+//!     "https://twitter.com/elonmusk/status/1608273870901096454".to_string() // No `ref_src` tracking params
+//! );
+//! ```
 use url::Url;
 
 mod rules;
@@ -48,6 +61,8 @@ impl M {
 /// eg.`https://example.com/?json` turns to `https://example.com/?json=` when
 /// `ToString` is called on the Url type.
 ///
+
+#[derive(Debug, Clone)]
 pub struct Cleaned(Url);
 
 impl std::ops::Deref for Cleaned {
@@ -64,6 +79,9 @@ impl ToString for Cleaned {
     }
 }
 
+/// Removes tracking parameters from a given [`Url`] type.
+/// 
+/// This owns the input and returns a [`Cleaned`] type.
 pub fn clean(url: Url) -> Cleaned {
     // Find applicable rules for this hostname
     let host = url.host_str();
@@ -75,6 +93,10 @@ pub fn clean(url: Url) -> Cleaned {
     Cleaned(clean_hash_params(clean_query_string(url, &rules), &rules))
 }
 
+/// Removes tracking parameters from a given string reference that is expected to be a valid URL.
+/// 
+/// This returns the cleaned URL as String.
+/// This returns error when the given input is not a valid URL.
 pub fn clean_str(url: &str) -> Result<String, url::ParseError> {
     let url = Url::parse(url)?;
     let url = clean(url);

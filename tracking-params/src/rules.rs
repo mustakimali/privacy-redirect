@@ -3,7 +3,7 @@
 //! The original source of this data is from the source code of
 //! `tracking-params` npm package by [dczysz](https://github.com/dczysz):
 //!
-//! https://github.com/dczysz/tracking-params/blob/5ccb3f8e3d4d6f3dfb88abe85a304fb78cfa41ce/src/params.ts
+//! [`https://github.com/dczysz/tracking-params/blob/5ccb3f8e3d4d6f3dfb88abe85a304fb78cfa41ce/src/params.ts`]
 use crate::{
     Rule,
     M::{self, Any, Contains, Exact, StartsWith},
