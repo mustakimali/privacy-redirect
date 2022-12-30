@@ -12,9 +12,11 @@ RUN cargo chef cook --release --recipe-path recipe.json
 RUN cargo build --release
 COPY tracking-params tracking-params
 COPY web web
+COPY browser-ext browser-ext
 COPY Cargo* ./
 
 ENV SQLX_OFFLINE true
+RUN mkdir /app/static
 RUN cargo test --release
 RUN cargo build --release
 RUN ls -lsah target/release
@@ -38,5 +40,6 @@ ENV RUST_LOG=info
 
 COPY --from=builder /app/target/release/privacy-redirect /app
 COPY --from=frontend-builder /app/build /app/static
+COPY browser-ext/script.js /app/static/script.js
 
 ENTRYPOINT ["/app/privacy-redirect"]
