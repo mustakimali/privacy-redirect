@@ -34,6 +34,7 @@ a {
 
 .previewLink {
   font-size: large;
+  word-wrap: break-word;
 }
 #host {
   font-weight: bold;
@@ -48,6 +49,9 @@ a {
   padding: 20px;
   background-color: #888;
   overflow-x: scroll;
+  color: white;
+  font-weight: normal;
+  background-color: #282c34;
 }
 
 h1 {

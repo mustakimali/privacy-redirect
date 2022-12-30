@@ -16,9 +16,6 @@ pub(crate) async fn start() -> anyhow::Result<()> {
         format!("0.0.0.0:8080")
     };
 
-    // parse every 15 mins
-    // cronjob
-
     start_inner(addr).await?;
 
     Ok(())
@@ -26,7 +23,8 @@ pub(crate) async fn start() -> anyhow::Result<()> {
 
 fn register_handlers(cfg: &mut ServiceConfig) {
     cfg.route("/", web::get().to(handlers::redirect))
-        .route("api/v1/healthcheck", web::get().to(handlers::health));
+        .route("/what-is-my-referrer", web::get().to(handlers::referrer))
+        .route("/api/v1/healthcheck", web::get().to(handlers::health));
 }
 
 async fn start_inner(addr: String) -> anyhow::Result<()> {
@@ -68,6 +66,7 @@ async fn start_inner(addr: String) -> anyhow::Result<()> {
             })
             .wrap(TracingLogger::default())
             .wrap(actix_web::middleware::Compress::default())
+            .service(actix_files::Files::new("/app", "./static").index_file("index.html"))
             .configure(register_handlers)
     })
     .bind(addr)?

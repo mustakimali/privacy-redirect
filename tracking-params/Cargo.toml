@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 url = "2.3.1"
 lazy_static = "1.4.0"
+urlencoding = "2.1.2"
 
 [dev-dependencies]
 test-case = "2.2.2"

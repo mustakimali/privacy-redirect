@@ -1,4 +1,7 @@
-use actix_web::{http::StatusCode, HttpResponse, Responder};
+use actix_web::{
+    http::{header, StatusCode},
+    HttpResponse, Responder,
+};
 use serde_json::json;
 
 #[derive(thiserror::Error, Debug)]
@@ -26,9 +29,13 @@ pub async fn health() -> impl Responder {
 
 const JSON_CONTENT_TYPE: &[u8] = "application/json".as_bytes();
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
-    let q = req.query_string();
+    let qs = req.query_string().to_string();
+    let q = urlencoding::decode(qs.as_str())
+        .map(|r| r.to_string())
+        .unwrap_or_else(|_| qs);
+
     if !q.is_empty() {
-        if let Ok(cleaned) = tracking_params::clean_str(q) {
+        if let Ok(cleaned) = tracking_params::clean_str(&q) {
             if let Some(ct) = req.headers().get("content-type") {
                 if ct
                     .as_bytes()
@@ -58,4 +65,18 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     HttpResponse::TemporaryRedirect()
         .append_header(("Location", "/app"))
         .finish()
+}
+
+pub async fn referrer(req: actix_web::HttpRequest) -> impl Responder {
+    let r = match req
+        .headers()
+        .get(header::REFERER)
+        .and_then(|r| r.to_str().ok())
+        .map(|r| r.to_string())
+    {
+        Some(rfr) => HttpResponse::Ok().body(json!({ "referrer": rfr }).to_string()),
+        None => HttpResponse::NotFound().finish(),
+    };
+
+    r
 }

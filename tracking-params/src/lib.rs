@@ -89,6 +89,12 @@ fn clean_query_string(url: Url, rules: &Vec<&Rule>) -> Url {
     return params.finish().to_owned();
 }
 
+// fn decode(inpt: &str) -> String {
+//     urlencoding::decode(inpt)
+//         .map(|r| r.to_string())
+//         .unwrap_or_else(|_| inpt.to_string())
+// }
+
 fn clean_hash_params(url: Url, rules: &Vec<&Rule>) -> Url {
     let mut url = url;
 
@@ -196,13 +202,17 @@ mod tests {
 
     // Misc
     #[test_case(
-            "https://example.com/my-post?utm_xyx=abc&id=12456",
-            "https://example.com/my-post?id=12456"; "misc: all utm_ query"
-        )]
+        "https://example.com/my-post?utm_xyx=abc&id=12456",
+        "https://example.com/my-post?id=12456"; "misc: all utm_ query"
+    )]
     #[test_case(
-            "https://example.com/my-post?utm_xyx=abc&id=12456&utm_life=asssc",
-            "https://example.com/my-post?id=12456"; "misc: all utm_ query (two)"
-        )]
+        "https://example.com/my-post?utm_xyx=abc&id=12456&utm_life=asssc",
+        "https://example.com/my-post?id=12456"; "misc: all utm_ query (two)"
+    )]
+    // #[test_case(
+    //     "https://href.li/?https://whatsmyreferer.com/?utm_campaign=twsrc^dUmBgUY",
+    //     "https://href.li/?https://whatsmyreferer.com/?utm_campaign=twsrc^dUmBgUY"; "misc: href.li"
+    // )]
     fn misc(input: &str, expected: &str) {
         test_common(input, expected)
     }
