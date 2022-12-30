@@ -17,3 +17,9 @@ Please send PR to:
 ## Submit Bug Report
 
 Please create a new issue.
+
+## To Do
+
+- [ ] Browser Extension (in progress) + Submit to extension store
+- [ ] Emit `/metrics` from the app
+- [ ] Tracing

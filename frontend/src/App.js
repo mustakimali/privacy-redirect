@@ -1,7 +1,7 @@
 import './App.css';
 import { useEffect, useState } from "react"
 import { cleanUrl, SERVER } from './http';
-import validUrl, { isHttpUri } from "valid-url"
+import validUrl from "valid-url"
 
 function App() {
   const [state, setState] = useState({
@@ -45,10 +45,10 @@ function App() {
       <div className="content">
         <div className="panel">
           <p>
-            Use this service to remove all known trackers and hide your referrer before redirecting your visitor to another site.
+            Removes all known trackers and hide your referrer before redirecting your visitor to another site.
           </p>
           <p>
-            Simply prefix the link with '<code>{SERVER}/?</code>'.
+            Simply prefix the link with <code>{SERVER}/?</code>
           </p>
           <p>
           Paste a link below to see preview ⚡
@@ -63,14 +63,19 @@ function App() {
                 </a>
               </p>
             </div>
-            Redirects to:
+            Redirects to cleanded link by <a href="https://whatsmyreferer.com/?utm_source=privacy-redirect">hiding your referrer</a>:
             <br/><br/>
             <input type="text" value={state.cleaned} placeholder="Cleaned link will appear hear" readOnly={true} />
           </form>
+          
           <p>
-            If you specify <code>Content-Type: application/json</code> then you get a json response.
+            <small>
+              If you specify <code>Content-Type: application/json</code> then you get a json response.
+            </small>
+
+            <pre className='preview'>{state.json}</pre>
           </p>
-          <pre className='preview'>{ state.json }</pre>
+          
         </div >
       </div >
       <div className="panel">
