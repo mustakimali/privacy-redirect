@@ -51,8 +51,6 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
 
     if !q.is_empty() {
         if let Ok(cleaned) = tracking_params::clean_str(&q) {
-            info!(dirty = q, cleaned = cleaned, "Cleaned");
-
             if let Some(ct) = req.headers().get("content-type") {
                 if ct
                     .as_bytes()
