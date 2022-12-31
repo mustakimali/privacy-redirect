@@ -13,14 +13,18 @@
 //!
 //! # Ok::<_, url::ParseError>(())
 //! ```
+use derivative::Derivative;
 use url::Url;
 
 mod rules;
 
-#[derive(Clone, Debug)]
+#[derive(Derivative)]
+#[derivative(Debug)]
 pub(crate) struct Rule {
     domains: Vec<M>,
     params: Vec<M>,
+    #[derivative(Debug = "ignore")]
+    handler: Option<Box<dyn Fn(Url) -> Url + Sync + Send>>,
 }
 
 #[derive(Clone, Debug)]
@@ -112,6 +116,16 @@ pub fn clean(url: Url) -> Cleaned {
 
     #[cfg(debug_assertions)]
     dbg!(matched_rules.clone());
+
+    // Run ths url through any rules that has a handler defined
+    let rules_with_handles = matched_rules.iter().filter(|r| r.handler.is_some());
+
+    let mut url = url;
+    for rule in rules_with_handles {
+        if let Some(handler) = &rule.handler {
+            url = handler(url);
+        }
+    }
 
     Cleaned(clean_hash_params(
         clean_query_string(url, &matched_rules),
@@ -288,8 +302,8 @@ mod tests {
     }
 
     #[test_case(
-        "https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_mKP8AhWXhFwKHSetARUQFnoECBgQAQ&url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFmE9c5S1DUp0",
-        "https://www.google.com/url?url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer"; "google result: only keeps url"
+        "https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFnE9c5S1DUp0",
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer"; "google result: parses the url query string"
     )]
     fn google(input: &str, expected: &str) {
         test_common(input, expected)

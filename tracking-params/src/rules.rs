@@ -4,6 +4,8 @@
 //! `tracking-params` npm package by [dczysz](https://github.com/dczysz):
 //!
 //! [`https://github.com/dczysz/tracking-params/blob/5ccb3f8e3d4d6f3dfb88abe85a304fb78cfa41ce/src/params.ts`]
+use url::Url;
+
 use crate::{
     Rule,
     M::{self, AllBut, Any, Contains, ContainsAll, Exact, StartsWith},
@@ -14,6 +16,7 @@ lazy_static::lazy_static! {
         Rule {
             domains: vec![Any],
             params: UNIVERSAL_PARAMS.to_vec(),
+            handler: None
         },
         Rule {
             domains: vec![Contains("amazon")],
@@ -33,6 +36,7 @@ lazy_static::lazy_static! {
                 Exact("sr"),
                 Exact("tag"),
             ],
+            handler: None
         },
         Rule {
             domains: vec![Contains("bing")],
@@ -45,6 +49,7 @@ lazy_static::lazy_static! {
                 Exact("sk"),
                 Exact("sp"),
             ],
+            handler: None
         },
         Rule {
             domains: vec![Contains("google")],
@@ -55,12 +60,14 @@ lazy_static::lazy_static! {
                 Exact("sei"),
                 Exact("ved"),
             ],
+            handler: None
         },
         Rule {
             domains: vec![ContainsAll(vec!["google", "/url"])],
             params: vec![
                 AllBut("url"),
             ],
+            handler: Some(Box::new(handle_google)),
         },
 
         Rule {
@@ -68,6 +75,7 @@ lazy_static::lazy_static! {
             params: vec![
                 Exact("igshid"),
             ],
+            handler: None
         },
         Rule {
             domains: vec![Contains("nytimes")],
@@ -75,6 +83,7 @@ lazy_static::lazy_static! {
                 Exact("emc"),
                 Exact("partner"),
             ],
+            handler: None
         },
         Rule {
             domains: vec![Contains("reddit")],
@@ -84,6 +93,7 @@ lazy_static::lazy_static! {
                 Exact("ref_source"),
                 Exact("st"),
             ],
+            handler: None
         },
         Rule {
             domains: vec![Contains("twitter")],
@@ -95,6 +105,7 @@ lazy_static::lazy_static! {
                 Exact("ref_src"),
                 Exact("ref_url"),
             ],
+            handler: None
         },
         Rule {
             domains: vec![Contains("youtube")],
@@ -104,6 +115,7 @@ lazy_static::lazy_static! {
                 Contains("feature"),
                 Contains("kw"),
             ],
+            handler: None
         },
     ];
 
@@ -155,4 +167,29 @@ lazy_static::lazy_static! {
         StartsWith("utm_"),
     ];
 
+}
+
+/// When you click on a search result on gooogle,
+/// It redirects to `/url?....` path with some tracking parameters.
+/// 
+/// We can do better than just removing the tracking parameters.
+/// We can extract the outgoing link (from a query string `url`)
+/// and redirect there directly.
+fn handle_google(url: Url) -> Url {
+    match url.query_pairs().find(|(k, _)| k.eq("url")) {
+        Some((_, actual_url)) => urlencoding::decode(&actual_url)
+            .map_err(anyhow::Error::from)
+            .and_then(|decoded| Url::parse(&decoded.to_string()).map_err(anyhow::Error::from))
+            .unwrap_or_else(|_| url),
+        None => url,
+    }
+}
+
+#[test]
+fn test_handle_google() {
+    let result = handle_google(Url::parse("https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFnE9c5S1DUp0").unwrap());
+    assert_eq!(
+        result.to_string(),
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer".to_string()
+    )
 }
