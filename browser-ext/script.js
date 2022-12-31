@@ -4,28 +4,31 @@ const privacyRedirect = {
     PROCESSED_URLS: new Set(),
 
     init: function () {
-        browser.webRequest.onBeforeRequest.addListener(handleRedirect, {
-            urls: ["<all_urls>"]
-        },
-            ["blocking"]
-        );
+        var isExtension = false;
+        if (typeof chrome === "object" || typeof browser === "object") {
+            // Browser Extension
+            let inst = typeof chrome === "object" ? chrome : browser;
+            isExtension = true;
 
-        console.log(`[Privacy Redirect] ${this.isExtension() ? "Extension " : ""}Loaded and protecting your privacy (${this.SERVER})`);
+            inst.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
+                urls: ["<all_urls>"]
+            }, ["blocking"]);
+        } else {
+            // Page Script
+            document.querySelector("body").addEventListener("click", function (event) {
+                var node = event.target;
+                while (node != null) {
+                    if (node == null) return;
+                    if (node.tagName === "A") break;
+                    node = node.parentNode;
+                }
+                if (node === null || node.href === null) return;
 
-        document.querySelector("body").addEventListener("click", function (event) {
-            var node = event.target;
-            while (node != null) {
-                if (node == null) return;
-                if (node.tagName === "A") break;
-                node = node.parentNode;
-            }
-            if (node === null || node.href === null) return;
+                node.href = processUrl(node.href, window.location.origin);
+            });
+        }
 
-            node.href = processUrl(node.href, window.location.origin);
-
-            // event.preventDefault();
-            // console.log(node.href);
-        });
+        console.log(`[Privacy Redirect] ${isExtension ? "Extension " : ""}Loaded and protecting your privacy (${this.SERVER})`);
 
     },
     processUrl: function (url, origin) {
@@ -42,38 +45,36 @@ const privacyRedirect = {
         }
         return url;
     },
-    isExtension: function () {
-        return typeof browser === 'object';
+    handleRedirect: function (requestDetails) {
+        try {
+            return privacyRedirect.handleRedirectInner(requestDetails);
+        } catch (e) {
+            console.warn(`[Privacy Redirect] Handle error: ${e} (Url: ${requestDetails.url})`);
+        };
     },
+    handleRedirectInner: function (requestDetails) {
+        var url = requestDetails.url;
+        var origin = requestDetails.originUrl;
+
+        if (requestDetails.documentUrl != undefined
+            || (origin != undefined && origin.startsWith(privacyRedirect.SERVER))) {
+            return {};
+        }
+
+        var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
+
+        if (url != redirected) {
+            console.log(`Processing: ${url}`);
+            return { redirectUrl: redirected };
+        } else {
+            return {};
+        }
+    }
+
 };
 
 try {
     privacyRedirect.init();
 } catch (e) {
     console.warn(`[Privacy Redirect] Error Loading: ${e}`);
-}
-
-function handleRedirect(requestDetails) {
-    try {
-        return handleRedirectInner(requestDetails);
-    } catch (e) {
-        console.warn(`[Privacy Redirect] Handle error: ${e} (Url: ${requestDetails.url})`);
-    }
-}
-function handleRedirectInner(requestDetails) {
-    var url = requestDetails.url;
-    if (requestDetails.documentUrl != undefined
-        || (requestDetails.originUrl != undefined && requestDetails.originUrl.startsWith(privacyRedirect.SERVER))) {
-        return {};
-    }
-
-    var redirected = privacyRedirect.processUrl(url, requestDetails.originUrl == undefined ? null : new URL(requestDetails.originUrl).origin);
-
-    if (url != redirected) {
-        //console.log(requestDetails);
-        console.log(`Processing: ${url}`);
-        return { redirectUrl: redirected };
-    } else {
-        return {};
-    }
 }
