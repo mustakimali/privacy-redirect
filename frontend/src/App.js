@@ -2,6 +2,7 @@ import './App.css';
 import { useEffect, useState } from "react"
 import { cleanUrl, SERVER } from './http';
 import validUrl from "valid-url"
+import getForFirefox from './get-the-addon-fx-apr-2020.svg'
 
 function App() {
   const [state, setState] = useState({
@@ -47,6 +48,17 @@ function App() {
           <p>
             Removes all known trackers and hide your referrer before redirecting your visitor to another site.
           </p>
+          <div>
+            <a href="https://addons.mozilla.org/en-US/firefox/addon/privacydir/">
+              <img src={getForFirefox} width="150px" />
+            </a>
+          </div>
+
+          <div style={{ fontSize: "small" }}>
+            <a href="#for-your-website">Installation instruction for own your website</a>
+          </div>
+
+          <h2>How does it work?</h2>
           <p>
             Simply prefix the link with <code>{SERVER}/?</code>
           </p>
@@ -77,19 +89,21 @@ function App() {
           </div>
 
         </div >
+
+        <div className="panel">
+          <h2 id="for-your-website">For your website</h2>
+
+          <p>Add the following script in your website</p>
+          <code>
+            &lt;script src="{SERVER}/app/script.js"&gt;&lt;/script&gt;
+          </code>
+        </div>
       </div >
-      <div className="panel">
-        <h2>For your website</h2>
 
-        <p>Add the following script in your website</p>
-        <code>
-          &lt;script src="{SERVER}/app/script.js"&gt;&lt;/script&gt;
-        </code>
-      </div>
-
-      <hr />
-
-      <div>
+      <div className='contentWide'>
+        <span>
+          Made with 💙 and 🦀 by  <a href="https://mustak.im">Mohammad Mustakim Ali</a>
+        </span>
         <a href="https://www.buymeacoffee.com/mustak.im" target="_blank">
           <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50px" style={{ margin: "10px" }} />
         </a>
