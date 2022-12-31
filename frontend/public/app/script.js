@@ -1,33 +1,80 @@
 const privacyRedirect = {
+    SERVER: "https://privacydir.com",
+    SERVER_PREFIX: "https://privacydir.com/?",
+    PROCESSED_URLS: new Set(),
+
     init: function () {
-        console.log("[Privacy Redirect] Loaded and protecting your privacy (https://privacydir.com)");
+        var isExtension = false;
+        if (navigator.userAgent.contains("Firefox")) {
+            // Browser Extension
+            let inst = typeof chrome === "object" ? chrome : browser;
+            isExtension = true;
 
-        document.querySelector("body").addEventListener("click", function (event) {
-            const SERVER_PREFIX = "https://privacydir.com/?";
-            var node = event.target;
-            while (node != null) {
-                if (node == null) return;
-                if (node.tagName === "A") break;
-                node = node.parentNode;
-            }
+            inst.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
+                urls: ["<all_urls>"]
+            }, ["blocking"]);
+        } else {
+            // Page Script
+            document.querySelector("body").addEventListener("click", function (event) {
+                var node = event.target;
+                while (node != null) {
+                    if (node == null) return;
+                    if (node.tagName === "A") break;
+                    node = node.parentNode;
+                }
+                if (node === null || node.href === null) return;
 
-            if (node.href.startsWith(SERVER_PREFIX)) return; // not already updated
+                node.href = processUrl(node.href, window.location.origin);
+            });
+        }
 
-            if (
-                node.href.startsWith("http")
-                && (!node.href.startsWith(window.location.origin) || node.href.indexOf("?") >= 0) // different site or has query string
-            ) {
-                node.href = SERVER_PREFIX + node.href;
-            } else if (node.href.startsWith("/") && node.href.indexOf("?") >= 0) { // relative link with query string
-                var absHref = window.location.origin + node.href;
-                node.href = absHref;
-            }
+        console.log(`[Privacy Redirect] ${isExtension ? "Extension " : ""}Loaded and protecting your privacy (${this.SERVER})`);
 
-            // event.preventDefault();
-            // console.log(node.href);
-        });
+    },
+    processUrl: function (url, origin) {
+        if (url.startsWith(this.SERVER_PREFIX)) return url; // already updated
 
+        if (
+            url.startsWith("http")
+            && (!url.startsWith(origin) || url.indexOf("?") >= 0) // different site or has query string
+        ) {
+            url = this.SERVER_PREFIX + url;
+        } else if (url.startsWith("/") && url.indexOf("?") >= 0) { // relative link with query string
+            var absHref = origin + url;
+            url = absHref;
+        }
+        return url;
+    },
+    handleRedirect: function (requestDetails) {
+        try {
+            return privacyRedirect.handleRedirectInner(requestDetails);
+        } catch (e) {
+            console.warn(`[Privacy Redirect] Handle error: ${e} (Url: ${requestDetails.url})`);
+        };
+    },
+    handleRedirectInner: function (requestDetails) {
+        var url = requestDetails.url;
+        var origin = requestDetails.originUrl;
+
+        if (requestDetails.documentUrl != undefined
+            || (origin != undefined && origin.startsWith(privacyRedirect.SERVER))) {
+            return {};
+        }
+
+        var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
+
+        if (url != redirected) {
+            console.log(`Processing: ${url}`);
+            return { redirectUrl: redirected };
+        } else {
+            return {};
+        }
     }
+
 };
 
-privacyRedirect.init();
+try {
+    privacyRedirect.init();
+} catch (e) {
+    console.warn(`[Privacy Redirect] Error Loading: ${e}`);
+}

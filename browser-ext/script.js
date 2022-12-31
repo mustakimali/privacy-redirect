@@ -1,11 +1,11 @@
 const privacyRedirect = {
     SERVER: "https://privacydir.com",
     SERVER_PREFIX: "https://privacydir.com/?",
-    PROCESSED_URLS: new Set(),
+    EXTENSION_LOADED: false,
 
     init: function () {
         var isExtension = false;
-        if (typeof chrome === "object" || typeof browser === "object") {
+        if (navigator.userAgent.indexOf("Firefox") >= 0 && (typeof chrome === "object" || typeof browser === "object")) {
             // Browser Extension
             let inst = typeof chrome === "object" ? chrome : browser;
             isExtension = true;
@@ -13,35 +13,41 @@ const privacyRedirect = {
             inst.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
                 urls: ["<all_urls>"]
             }, ["blocking"]);
+            privacyRedirect.EXTENSION_LOADED = true;
         } else {
             // Page Script
-            document.querySelector("body").addEventListener("click", function (event) {
-                var node = event.target;
-                while (node != null) {
-                    if (node == null) return;
-                    if (node.tagName === "A") break;
-                    node = node.parentNode;
-                }
-                if (node === null || node.href === null) return;
-
-                node.href = processUrl(node.href, window.location.origin);
-            });
+            privacyRedirect.initPageScript();
         }
 
         console.log(`[Privacy Redirect] ${isExtension ? "Extension " : ""}Loaded and protecting your privacy (${this.SERVER})`);
 
+    },
+    initPageScript: function () {
+        document.querySelector("body").addEventListener("click", function (event) {
+            console.log(event);
+            var node = event.target;
+            while (node != null) {
+                if (node == null) return;
+                if (node.tagName === "A") break;
+                node = node.parentNode;
+            }
+            if (node === null || node.href === null) return;
+
+            const newUrl = privacyRedirect.processUrl(node.href, window.location.origin);
+            if (node.href != newUrl) {
+                console.log(`Processing: ${node.href}`);
+                node.href = newUrl;
+            }
+        });
     },
     processUrl: function (url, origin) {
         if (url.startsWith(this.SERVER_PREFIX)) return url; // already updated
 
         if (
             url.startsWith("http")
-            && (!url.startsWith(origin) || url.indexOf("?") >= 0) // different site or has query string
+            && (!url.startsWith(origin)) // different site and has query string
         ) {
             url = this.SERVER_PREFIX + url;
-        } else if (url.startsWith("/") && url.indexOf("?") >= 0) { // relative link with query string
-            var absHref = origin + url;
-            url = absHref;
         }
         return url;
     },
