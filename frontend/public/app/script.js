@@ -23,8 +23,8 @@ const privacyRedirect = {
                 node.href = absHref;
             }
 
-            event.preventDefault();
-            console.log(node.href);
+            // event.preventDefault();
+            // console.log(node.href);
         });
 
     }

@@ -71,7 +71,10 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
             let html = REDIRECT_HTML
                 .replace("$$URL$$", &cleaned)
                 .replace("$$URL_ESCAPED$$", &cleaned_escaped);
-            return HttpResponse::Ok().body(html);
+            return HttpResponse::Ok()
+                .append_header(("cache-control", "public, max-age=86400"))
+                .append_header(("vary", "*"))
+                .body(html);
         }
     }
 
