@@ -54,7 +54,7 @@ impl M {
                     .map(|a| M::Contains(a))
                     .collect::<Vec<_>>()
                     .iter()
-                    .all(|a| dbg!(a.matches(Some(input)))),
+                    .all(|a| a.matches(Some(input))),
 
                 M::AllBut(c) => !c.as_bytes().eq(input),
             },

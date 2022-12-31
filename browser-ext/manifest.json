@@ -6,19 +6,15 @@
     "icons": {
         "48": "icon-48.png"
     },
-    "content_scripts": [
-        {
-            "matches": [
-                "*://*/*"
-            ],
-            "js": [
-                "script.js"
-            ]
-        }
-    ],
+    "background": {
+        "scripts": [
+            "script.js"
+        ]
+    },
+    
     "permissions": [
-        "https://privacydir.com/*",
         "webRequest",
-        "webRequestBlocking"
+        "webRequestBlocking",
+        "<all_urls>"
     ]
 }
