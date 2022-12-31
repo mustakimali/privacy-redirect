@@ -11,17 +11,6 @@
             "script.js"
         ]
     },
-    "content_scripts": [
-        {
-            "matches": [
-                "*://*/*"
-            ],
-            "js": [
-                "ext.js"
-            ]
-        }
-    ],
-    
     "permissions": [
         "webRequest",
         "webRequestBlocking",

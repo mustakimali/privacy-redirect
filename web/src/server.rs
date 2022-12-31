@@ -5,7 +5,6 @@ use actix_web::{
 };
 use chrono::Utc;
 use tracing::info;
-use tracing_actix_web::TracingLogger;
 
 use crate::handlers;
 
@@ -64,7 +63,6 @@ async fn start_inner(addr: String) -> anyhow::Result<()> {
                     Ok(res)
                 }
             })
-            .wrap(TracingLogger::default())
             .wrap(actix_web::middleware::Compress::default())
             .service(actix_files::Files::new("/app", "./static").index_file("index.html"))
             .configure(register_handlers)

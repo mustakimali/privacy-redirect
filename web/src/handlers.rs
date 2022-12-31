@@ -42,26 +42,33 @@ window.location.replace( "$$URL_ESCAPED$$" + window.location.hash );
 </script>
 </head>
 <body style="background-color: black;"><p>Redirecting..<br /><a href="$$URL$$">$$URL$$</a></p></body></html>"#;
-pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
-    let qs = req.query_string().to_string();
-    let q = urlencoding::decode(qs.as_str())
-        .map(|r| r.to_string())
-        .unwrap_or_else(|_| qs);
 
-    if !q.is_empty() {
-        if let Ok(cleaned) = tracking_params::clean_str(&q) {
+#[tracing::instrument(skip(req), fields(input_hash = "", cleaned = false, json = false))]
+pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
+    let input_url = req.query_string().to_string();
+    // let input_url = urlencoding::decode(&input_url)
+    //     .map(|r| r.to_string())
+    //     .unwrap_or_else(|_| qs);
+    tracing::Span::current().record("input_hash", hash(&input_url));
+
+    if !input_url.is_empty() {
+        if let Ok(cleaned) = tracking_params::clean_str(&input_url) {
+            let removed_trackers = cleaned != input_url;
+            tracing::Span::current().record("cleaned", removed_trackers);
+
             if let Some(ct) = req.headers().get("content-type") {
                 if ct
                     .as_bytes()
                     .windows(JSON_CONTENT_TYPE.len())
                     .any(|w| w.eq(JSON_CONTENT_TYPE))
                 {
+                    tracing::Span::current().record("json", true);
                     return HttpResponse::Ok()
                         .append_header(("content-type", "application/json"))
                         .body(
                             json!({
                                 "cleaned_url": cleaned,
-                                "original_url": q
+                                "original_url": input_url
                             })
                             .to_string(),
                         );
@@ -98,4 +105,8 @@ pub async fn referrer(req: actix_web::HttpRequest) -> impl Responder {
     };
 
     r
+}
+
+fn hash(input: &str) -> String {
+    blake3::hash(input.as_bytes()).to_hex().to_string()
 }

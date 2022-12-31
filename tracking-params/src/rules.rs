@@ -171,7 +171,7 @@ lazy_static::lazy_static! {
 
 /// When you click on a search result on gooogle,
 /// It redirects to `/url?....` path with some tracking parameters.
-/// 
+///
 /// We can do better than just removing the tracking parameters.
 /// We can extract the outgoing link (from a query string `url`)
 /// and redirect there directly.
