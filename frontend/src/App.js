@@ -51,7 +51,7 @@ function App() {
             Simply prefix the link with <code>{SERVER}/?</code>
           </p>
           <p>
-          Paste a link below to see preview ⚡
+            Paste a link below to see preview ⚡
           </p>
           <input type="text" defaultValue={state.url} onChange={updateResult} placeholder="Paste a link" />
 
@@ -64,18 +64,18 @@ function App() {
               </p>
             </div>
             Redirects to cleanded link by <a href="https://whatsmyreferer.com/?utm_source=privacy-redirect">hiding your referrer</a>:
-            <br/><br/>
+            <br /><br />
             <input type="text" value={state.cleaned} placeholder="Cleaned link will appear hear" readOnly={true} />
           </form>
-          
-          <p>
+
+          <div>
             <small>
               If you specify <code>Content-Type: application/json</code> then you get a json response.
             </small>
 
             <pre className='preview'>{state.json}</pre>
-          </p>
-          
+          </div>
+
         </div >
       </div >
       <div className="panel">
@@ -85,6 +85,14 @@ function App() {
         <code>
           &lt;script src="{SERVER}/app/script.js"&gt;&lt;/script&gt;
         </code>
+      </div>
+
+      <hr />
+
+      <div>
+        <a href="https://www.buymeacoffee.com/mustak.im" target="_blank">
+          <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50px" style={{ margin: "10px" }} />
+        </a>
       </div>
     </div>
   );
