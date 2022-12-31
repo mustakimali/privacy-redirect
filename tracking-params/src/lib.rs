@@ -3,13 +3,15 @@
 //! Removes unwanted tracking parameters from a given URLs.
 //!
 //! ```rust
-//! let dirty_url = url::Url::parse("https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY").unwrap();
+//! let dirty_url = url::Url::parse("https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY")?;
 //! let clean_url = tracking_params::clean(dirty_url); // returns `Cleaned` which derefs to `url::Url`
 //!
 //! assert_eq!(
 //!     clean_url.to_string(),
 //!     "https://twitter.com/elonmusk/status/1608273870901096454".to_string() // No `ref_src` tracking params
 //! );
+//! 
+//! # Ok::<_, url::ParseError>(())
 //! ```
 use url::Url;
 
