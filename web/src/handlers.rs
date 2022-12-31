@@ -48,9 +48,10 @@ window.location.replace( "$$URL_ESCAPED$$" + window.location.hash );
     fields(input_hash = "", cleaned = false, json = false, http.header.ip = ""))]
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     let input_url = req.query_string().to_string();
-    // let input_url = urlencoding::decode(&input_url)
-    //     .map(|r| r.to_string())
-    //     .unwrap_or_else(|_| qs);
+    let input_url = urlencoding::decode(&input_url)
+        .map(|r| r.to_string())
+        .unwrap_or_else(|_| input_url);
+
     tracing::Span::current().record("input_hash", hash(&input_url));
     if let Some((_, cf_header)) = req
         .headers()
@@ -91,14 +92,12 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
                 .replace("$$URL_ESCAPED$$", &cleaned_escaped);
             return HttpResponse::Ok()
                 .append_header(("cache-control", "public, max-age=86400"))
-                .append_header(("vary", "*"))
+                .append_header(("content-type", "text/html; charset=utf-8"))
                 .body(html);
         }
     }
 
     // Redirect to Frontend App
-    if cfg!(debug_assertions) {}
-
     HttpResponse::TemporaryRedirect()
         .append_header(("Location", "/app"))
         .finish()
