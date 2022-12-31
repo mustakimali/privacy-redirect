@@ -43,13 +43,24 @@ window.location.replace( "$$URL_ESCAPED$$" + window.location.hash );
 </head>
 <body style="background-color: black;"><p>Redirecting..<br /><a href="$$URL$$">$$URL$$</a></p></body></html>"#;
 
-#[tracing::instrument(skip(req), fields(input_hash = "", cleaned = false, json = false))]
+#[tracing::instrument(
+    skip(req),
+    fields(input_hash = "", cleaned = false, json = false, http.header.ip = ""))]
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     let input_url = req.query_string().to_string();
     // let input_url = urlencoding::decode(&input_url)
     //     .map(|r| r.to_string())
     //     .unwrap_or_else(|_| qs);
     tracing::Span::current().record("input_hash", hash(&input_url));
+    if let Some((_, cf_header)) = req
+        .headers()
+        .iter()
+        .filter(|(k, _)| k.as_str() == "cf-connecting-ip")
+        .collect::<Vec<_>>()
+        .first()
+    {
+        tracing::Span::current().record("http.header.ip", cf_header.to_str().unwrap_or_default());
+    }
 
     if !input_url.is_empty() {
         if let Ok(cleaned) = tracking_params::clean_str(&input_url) {
@@ -74,7 +85,7 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
                         );
                 }
             }
-            let cleaned_escaped = cleaned.replace("/", r#"\/"#);
+            let cleaned_escaped = cleaned.replace('/', r#"\/"#);
             let html = REDIRECT_HTML
                 .replace("$$URL$$", &cleaned)
                 .replace("$$URL_ESCAPED$$", &cleaned_escaped);

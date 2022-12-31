@@ -16,7 +16,7 @@ async fn main() -> std::io::Result<()> {
 }
 
 fn init_tracing() {
-    let env_filter = EnvFilter::new("info".to_string());
+    let env_filter = EnvFilter::new("info");
     let formatting_layer = BunyanFormattingLayer::new("privacy-press".into(), std::io::stdout);
 
     let subscriber = Registry::default()

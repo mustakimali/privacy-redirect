@@ -179,8 +179,8 @@ fn handle_google(url: Url) -> Url {
     match url.query_pairs().find(|(k, _)| k.eq("url")) {
         Some((_, actual_url)) => urlencoding::decode(&actual_url)
             .map_err(anyhow::Error::from)
-            .and_then(|decoded| Url::parse(&decoded.to_string()).map_err(anyhow::Error::from))
-            .unwrap_or_else(|_| url),
+            .and_then(|decoded| Url::parse(&decoded).map_err(anyhow::Error::from))
+            .unwrap_or(url),
         None => url,
     }
 }

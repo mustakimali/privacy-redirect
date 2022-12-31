@@ -10,10 +10,11 @@ use crate::handlers;
 
 pub(crate) async fn start() -> anyhow::Result<()> {
     let addr = if cfg!(debug_assertions) {
-        format!("127.0.0.1:8080")
+        "127.0.0.1:8080"
     } else {
-        format!("0.0.0.0:8080")
-    };
+        "0.0.0.0:8080"
+    }
+    .to_string();
 
     start_inner(addr).await?;
 
@@ -32,9 +33,10 @@ async fn start_inner(addr: String) -> anyhow::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap_fn(|req, srv| {
+                let start = Utc::now();
+
                 let fut = actix_web::dev::Service::call(&srv, req);
-                async {
-                    let start = Utc::now();
+                async move {
                     let mut res = fut.await?;
                     let duration = Utc::now() - start;
 

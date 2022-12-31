@@ -106,7 +106,7 @@ pub fn clean(url: Url) -> Cleaned {
     // Find applicable rules for this hostname
     let host_path = format!(
         "{}/{}",
-        url.host_str().unwrap_or_default().trim_end_matches("/"),
+        url.host_str().unwrap_or_default().trim_end_matches('/'),
         url.path()
     );
     let matched_rules = rules::GLOBAL_PARAMS
@@ -144,7 +144,7 @@ pub fn clean_str(url: &str) -> Result<String, url::ParseError> {
     Ok(url.to_string())
 }
 
-fn clean_query_string(url: Url, rules: &Vec<&Rule>) -> Url {
+fn clean_query_string(url: Url, rules: &[&Rule]) -> Url {
     let mut url = url;
     if url.query().is_none() {
         return url;
@@ -172,27 +172,27 @@ fn clean_query_string(url: Url, rules: &Vec<&Rule>) -> Url {
         params.append_pair(k.as_ref(), v.as_ref());
     }
 
-    return params.finish().to_owned();
+    params.finish().to_owned()
 }
 
-fn clean_hash_params(url: Url, rules: &Vec<&Rule>) -> Url {
+fn clean_hash_params(url: Url, rules: &[&Rule]) -> Url {
     let mut url = url;
 
     if let Some(f) = url.fragment() {
         let mut fr = String::with_capacity(f.len());
 
-        for item in f.split("&") {
-            if let Some(key) = item.split("=").take(1).collect::<Vec<_>>().first() {
+        for item in f.split('&') {
+            if let Some(key) = item.split('=').take(1).collect::<Vec<_>>().first() {
                 if !rules
                     .iter()
                     .any(|r| r.params.iter().any(|p| p.matches_str(Some(*key))))
                 {
                     fr.push_str(item);
-                    fr.push_str("&");
+                    fr.push('&');
                 }
             }
         }
-        if fr.ends_with("&") {
+        if fr.ends_with('&') {
             fr.remove(fr.len() - 1);
         }
 
