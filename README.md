@@ -3,8 +3,18 @@
 A web service to remove known tracking urls before redirecting.
 
 ## How to Use?
+### For your browser
 
-(To be written.)
+[<img src="frontend/src/get-the-addon-fx-apr-2020.svg" height="60" />](https://addons.mozilla.org/en-US/firefox/addon/privacydir/)
+
+
+### For your website
+
+Install the script in your website.
+
+```html
+<script src="https://privacydir.com/app/script.js"></script>
+```
 
 
 ## How to Contribute?
@@ -16,10 +26,11 @@ Please send PR to:
 
 ## Submit Bug Report
 
-Please create a new issue.
+Please create a new issue or submit your feedback using [this form](https://forms.gle/xd5XFT6JHRTvvwqY6).
+
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="60" />](https://www.buymeacoffee.com/mustak.im)
 
 ## To Do
-
-- [ ] Browser Extension (in progress) + Submit to extension store
+- [x] Browser Extension (in progress) (Firefox: Submitted for review, Chrome: WIP)
 - [ ] Emit `/metrics` from the app
 - [ ] Tracing
