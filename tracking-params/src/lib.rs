@@ -10,7 +10,7 @@
 //!     clean_url.to_string(),
 //!     "https://twitter.com/elonmusk/status/1608273870901096454".to_string() // No `ref_src` tracking params
 //! );
-//! 
+//!
 //! # Ok::<_, url::ParseError>(())
 //! ```
 use url::Url;
@@ -26,6 +26,8 @@ pub(crate) struct Rule {
 #[derive(Clone, Debug)]
 pub(crate) enum M {
     Any,
+    AllBut(&'static str),
+    ContainsAll(Vec<&'static str>),
     Exact(&'static str),
     StartsWith(&'static str),
     Contains(&'static str),
@@ -43,11 +45,23 @@ impl M {
                 M::Exact(e) => input.eq(e.as_bytes()),
                 M::StartsWith(sw) => input.starts_with(sw.as_bytes()),
                 M::Contains(c) => input.windows(c.len()).any(|w| w.eq(c.as_bytes())),
+                M::ContainsAll(all) => all
+                    .iter()
+                    .map(|a| M::Contains(a))
+                    .collect::<Vec<_>>()
+                    .iter()
+                    .all(|a| dbg!(a.matches(Some(input)))),
+
+                M::AllBut(c) => !c.as_bytes().eq(input),
             },
             None => match self {
                 M::Any => true,
 
-                M::Exact(_) | M::StartsWith(_) | M::Contains(_) => false,
+                M::Exact(_)
+                | M::StartsWith(_)
+                | M::Contains(_)
+                | M::ContainsAll(_)
+                | M::AllBut(_) => false,
             },
         }
     }
@@ -82,21 +96,31 @@ impl ToString for Cleaned {
 }
 
 /// Removes tracking parameters from a given [`Url`] type.
-/// 
+///
 /// This owns the input and returns a [`Cleaned`] type.
 pub fn clean(url: Url) -> Cleaned {
     // Find applicable rules for this hostname
-    let host = url.host_str();
-    let rules = rules::GLOBAL_PARAMS
+    let host_path = format!(
+        "{}/{}",
+        url.host_str().unwrap_or_default().trim_end_matches("/"),
+        url.path()
+    );
+    let matched_rules = rules::GLOBAL_PARAMS
         .iter()
-        .filter(|r| r.domains.iter().any(|d| d.matches_str(host)))
+        .filter(|r| r.domains.iter().any(|d| d.matches_str(Some(&host_path))))
         .collect::<Vec<_>>();
 
-    Cleaned(clean_hash_params(clean_query_string(url, &rules), &rules))
+    #[cfg(debug_assertions)]
+    dbg!(matched_rules.clone());
+
+    Cleaned(clean_hash_params(
+        clean_query_string(url, &matched_rules),
+        &matched_rules,
+    ))
 }
 
 /// Removes tracking parameters from a given string reference that is expected to be a valid URL.
-/// 
+///
 /// This returns the cleaned URL as String.
 /// This returns error when the given input is not a valid URL.
 pub fn clean_str(url: &str) -> Result<String, url::ParseError> {
@@ -260,6 +284,14 @@ mod tests {
         "https://whatsmyreferer.com/?json"; "misc: no trailing eq ="
     )]
     fn misc(input: &str, expected: &str) {
+        test_common(input, expected)
+    }
+
+    #[test_case(
+        "https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_mKP8AhWXhFwKHSetARUQFnoECBgQAQ&url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFmE9c5S1DUp0",
+        "https://www.google.com/url?url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer"; "google result: only keeps url"
+    )]
+    fn google(input: &str, expected: &str) {
         test_common(input, expected)
     }
 

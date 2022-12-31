@@ -3,7 +3,6 @@ use actix_web::{
     HttpResponse, Responder,
 };
 use serde_json::json;
-use tracing::info;
 
 #[derive(thiserror::Error, Debug)]
 pub enum HttpError {

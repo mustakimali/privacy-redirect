@@ -6,7 +6,7 @@
 //! [`https://github.com/dczysz/tracking-params/blob/5ccb3f8e3d4d6f3dfb88abe85a304fb78cfa41ce/src/params.ts`]
 use crate::{
     Rule,
-    M::{self, Any, Contains, Exact, StartsWith},
+    M::{self, AllBut, Any, Contains, ContainsAll, Exact, StartsWith},
 };
 
 lazy_static::lazy_static! {
@@ -56,6 +56,13 @@ lazy_static::lazy_static! {
                 Exact("ved"),
             ],
         },
+        Rule {
+            domains: vec![ContainsAll(vec!["google", "/url"])],
+            params: vec![
+                AllBut("url"),
+            ],
+        },
+
         Rule {
             domains: vec![Contains("instagram")],
             params: vec![

@@ -17,7 +17,8 @@
         }
     ],
     "permissions": [
-        "https://privacy-redirect.fly.dev/*",
-        "*://*/*"
+        "https://privacydir.com/*",
+        "webRequest",
+        "webRequestBlocking"
     ]
 }
