@@ -1,7 +1,6 @@
 const privacyRedirect = {
     SERVER: "https://privacydir.com",
     SERVER_PREFIX: "https://privacydir.com/?",
-    EXTENSION_LOADED: false,
 
     init: function () {
         var isExtension = false;
@@ -13,7 +12,6 @@ const privacyRedirect = {
             inst.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
                 urls: ["<all_urls>"]
             }, ["blocking"]);
-            privacyRedirect.EXTENSION_LOADED = true;
         } else {
             // Page Script
             privacyRedirect.initPageScript();
