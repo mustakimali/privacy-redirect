@@ -91,7 +91,7 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
                 .replace("$$URL$$", &cleaned)
                 .replace("$$URL_ESCAPED$$", &cleaned_escaped);
             return HttpResponse::Ok()
-                .append_header(("cache-control", "public, max-age=86400"))
+                .append_header(("cache-control", "public, max-age=300"))
                 .append_header(("content-type", "text/html; charset=utf-8"))
                 .body(html);
         }

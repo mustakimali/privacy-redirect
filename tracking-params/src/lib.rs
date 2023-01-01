@@ -27,6 +27,7 @@ pub(crate) struct Rule {
     handler: Option<Box<dyn Fn(Url) -> Url + Sync + Send>>,
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub(crate) enum M {
     Any,

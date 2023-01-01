@@ -4,11 +4,14 @@
 //! `tracking-params` npm package by [dczysz](https://github.com/dczysz):
 //!
 //! [`https://github.com/dczysz/tracking-params/blob/5ccb3f8e3d4d6f3dfb88abe85a304fb78cfa41ce/src/params.ts`]
+//! More sources:
+//! * [`https://maxchadwick.xyz/tracking-query-params-registry/`]
+//!
 use url::Url;
 
 use crate::{
     Rule,
-    M::{self, AllBut, Any, Contains, ContainsAll, Exact, StartsWith},
+    M::{self, *},
 };
 
 lazy_static::lazy_static! {
@@ -117,6 +120,27 @@ lazy_static::lazy_static! {
             ],
             handler: None
         },
+        // https://community.spotify.com/t5/Desktop-Windows/si-Parameter-in-Spotify-URL-s/td-p/4538290
+        Rule {
+            domains: vec![Contains("spotify")],
+            params: vec![
+                Exact("si")
+            ],
+            handler: None
+        },
+        // https://partnerhelp.ebay.com/helpcenter/s/article/What-are-the-parameters-of-an-EPN-link#tracking-link-format
+        Rule {
+            domains: vec![Contains("ebay")],
+            params: vec![
+                Exact("mkevt"),
+                Exact("mkcid"),
+                Exact("mkrid"),
+                Exact("campid"),
+                Exact("toolid"),
+                Exact("customid"),
+            ],
+            handler: None
+        },
     ];
 
     static ref UNIVERSAL_PARAMS: Vec<M> = vec![
@@ -165,6 +189,23 @@ lazy_static::lazy_static! {
         StartsWith("pd_rd"),
         StartsWith("pf_rd"),
         StartsWith("utm_"),
+        // Matomo: https://matomo.org/docs/tracking-campaigns/
+        StartsWith("mtm_"),
+        StartsWith("matomo_"),
+        // Hubspot: https://knowledge.hubspot.com/ads/ad-tracking-in-hubspot
+        StartsWith("hsa_"),
+        //Piwik
+        StartsWith("pk_"),
+        //Listrak
+        StartsWith("trk_"),
+        // Microsoft Advertising: https://help.ads.microsoft.com/apex/index/3/en/60000
+        Exact("msclkid"),
+        // Google advertising:
+        Exact("_ga"),
+        Exact("gclid"),
+        Exact("gclsrc"),
+
+
     ];
 
 }
