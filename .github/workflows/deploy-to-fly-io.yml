@@ -11,5 +11,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v2
+        - name: First run experience
+          run: git clone https://github.com/mustakimali/privacy-redirect && cd privacy-redirect && ./build.sh && cargo check
         - uses: superfly/flyctl-actions/setup-flyctl@master
         - run: flyctl deploy
