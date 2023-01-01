@@ -114,9 +114,6 @@ pub fn clean(url: Url) -> Cleaned {
         .filter(|r| r.domains.iter().any(|d| d.matches_str(Some(&host_path))))
         .collect::<Vec<_>>();
 
-    #[cfg(debug_assertions)]
-    dbg!(matched_rules.clone());
-
     // Run ths url through any rules that has a handler defined
     let rules_with_handles = matched_rules.iter().filter(|r| r.handler.is_some());
 

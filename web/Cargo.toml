@@ -18,6 +18,8 @@ tracing-opentelemetry = { version = "0.18" }
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 tracing-bunyan-formatter = "0.3"
 tracing-log = "0.1.1"
+tracing-honeycomb = "0.4.3"
+libhoney-rust = "0.1.6"
 chrono = { version = "0.4.23", features = ["serde"]}
 serde = "1.0.151"
 serde_derive = "1.0.151"
