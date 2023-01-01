@@ -7,7 +7,7 @@ fn main() {
     fs::copy("../browser-ext/script.js", "../static/script.js")
         .expect("copy script file from `browser-ext` folder to static folder");
 
-    if Path::new("../browser-ext/").exists() {
+    if Path::new("../frontend").exists() {
         fs::copy(
             "../browser-ext/script.js",
             "../frontend/public/app/script.js",

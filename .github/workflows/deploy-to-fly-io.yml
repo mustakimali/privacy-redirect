@@ -19,4 +19,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: First run experience
-        run: git clone https://github.com/mustakimali/privacy-redirect && cd privacy-redirect && ./build.sh && cargo check
+        run: ./build.sh && cargo check
