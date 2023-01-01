@@ -7,11 +7,16 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
-      name: Deploy app
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-        - name: First run experience
-          run: git clone https://github.com/mustakimali/privacy-redirect && cd privacy-redirect && ./build.sh && cargo check
-        - uses: superfly/flyctl-actions/setup-flyctl@master
-        - run: flyctl deploy
+    name: Deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy
+  first-run-check:
+    name: First run experience check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: First run experience
+        run: git clone https://github.com/mustakimali/privacy-redirect && cd privacy-redirect && ./build.sh && cargo check
