@@ -37,11 +37,11 @@ const REDIRECT_HTML: &str = r#"
 <meta name="referrer" content="no-referrer" />
 <script type="text/javascript">
 /* <![CDATA[ */
-window.location.replace( "$$URL_ESCAPED$$" + window.location.hash );
+window.opener = null; window.location.replace("$$URL_ESCAPED$$" + window.location.hash);
 /* ]]> */
 </script>
 </head>
-<body style="background-color: black;"><p>Redirecting..<br /><a href="$$URL$$">$$URL$$</a></p></body></html>"#;
+<body style="background-color: #000;color: #ccc;"><p>Redirecting:<br /><a href="$$URL$$">$$URL$$</a></p></body></html>"#;
 
 #[tracing::instrument(
     skip(req),
