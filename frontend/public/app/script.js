@@ -59,6 +59,10 @@ const privacyRedirect = {
         };
     },
     handleRedirectInner: function (requestDetails) {
+        if (requestDetails.method !== "GET") {
+            return {};
+        }
+
         var url = requestDetails.url;
         var origin = requestDetails.originUrl;
 
