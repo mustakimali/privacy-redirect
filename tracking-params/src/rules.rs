@@ -65,7 +65,7 @@ lazy_static::lazy_static! {
         Rule {
             domains: vec![ContainsAll(vec!["google", "/url"])],
             params: vec![
-                AllBut("url"),
+                Exact("usg"),
             ],
             handler: Some(Box::new(handle_google)),
         },
@@ -173,7 +173,7 @@ lazy_static::lazy_static! {
 /// It redirects to `/url?....` path with some tracking parameters.
 ///
 /// We can do better than just removing the tracking parameters.
-/// We can extract the outgoing link (from a query string `url`)
+/// We can extract the outgoing link (from a query string `url` or `q` whichever is present)
 /// and redirect there directly.
 fn handle_google(url: Url) -> Url {
     match url.query_pairs().find(|(k, _)| k.eq("url")) {
@@ -181,7 +181,10 @@ fn handle_google(url: Url) -> Url {
             .map_err(anyhow::Error::from)
             .and_then(|decoded| Url::parse(&decoded).map_err(anyhow::Error::from))
             .unwrap_or(url),
-        None => url,
+        None => match url.query_pairs().find(|(k, _)| k.eq("q")) {
+            Some((_, q)) => url::Url::parse(&q).unwrap_or(url),
+            None => url,
+        },
     }
 }
 
@@ -191,5 +194,14 @@ fn test_handle_google() {
     assert_eq!(
         result.to_string(),
         "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer".to_string()
+    )
+}
+
+#[test]
+fn test_handle_google_no_url() {
+    let result = handle_google(Url::parse("https://www.google.com/url?q=http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/&sa=D&source=calendar&usd=2&usg=AOvVaw0DUKL0RoiXBhCFMYU_U2jY").unwrap());
+    assert_eq!(
+        result.to_string(),
+        "http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/".to_string()
     )
 }

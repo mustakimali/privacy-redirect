@@ -302,6 +302,10 @@ mod tests {
         "https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFnE9c5S1DUp0",
         "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer"; "google result: parses the url query string"
     )]
+    #[test_case(
+        "https://www.google.com/url?q=http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/&sa=D&source=calendar&usd=2&usg=AOvVaw0DUKL0RoiXBhCFMYU_U2jY",
+        "http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/"; "google result: no url query string"
+    )]
     fn google(input: &str, expected: &str) {
         test_common(input, expected)
     }
