@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Privacy Redirect",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "Remove all known trackers and hide your referrer before redirecting to another site",
     "icons": {
         "48": "icon-48.png"

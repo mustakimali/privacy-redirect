@@ -100,6 +100,13 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
         .finish()
 }
 
+pub async fn allowed_list(_req: actix_web::HttpRequest) -> impl Responder {
+    HttpResponse::Ok()
+        .append_header(("cache-control", "public, max-age=300"))
+        .append_header(("content-type", "application/json"))
+        .body(json!({ "result": super::ALLOWED_LIST.to_vec() }).to_string())
+}
+
 fn hash(input: &str) -> String {
     blake3::hash(input.as_bytes()).to_hex().to_string()
 }

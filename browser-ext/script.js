@@ -2,6 +2,8 @@ const privacyRedirect = {
     SERVER: "https://privacydir.com",
     SERVER_PREFIX: "https://privacydir.com/?",
 
+    ALLOWED_LIST_GLOBAL: [],
+
     init: function () {
         var isExtension = false;
         if (navigator.userAgent.indexOf("Firefox") >= 0 && (typeof chrome === "object" || typeof browser === "object")) {
@@ -60,13 +62,21 @@ const privacyRedirect = {
         if (requestDetails.method !== "GET") {
             return {};
         }
-
         var url = requestDetails.url;
         var origin = requestDetails.originUrl;
 
         if (requestDetails.documentUrl != undefined
             || (origin != undefined && origin.startsWith(privacyRedirect.SERVER))) {
             return {};
+        }
+
+        const allowed = privacyRedirect.getAllowedList();
+        const urlParam = new URL(url);
+        for (var i = 0; i < allowed.length; i++) {
+            if (urlParam.hostname.indexOf(allowed[i]) >= 0) {
+                console.log(`Skipped Processing: ${url}`);
+                return {};
+            }
         }
 
         var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
@@ -77,12 +87,34 @@ const privacyRedirect = {
         } else {
             return {};
         }
+    },
+    getAllowedList: function () {
+        return privacyRedirect.ALLOWED_LIST_GLOBAL;
+    },
+    updateAllowedList: function () {
+        fetch(`${privacyRedirect.SERVER}/api/v1/allowed-list`)
+            .then(r => r.json())
+            .then(r => {
+                const list = r.result;
+                privacyRedirect.ALLOWED_LIST_GLOBAL = list;
+
+                console.log("The following domains will be skipped as they are known to break due to missing referrer.: " + JSON.stringify(list));
+            }).catch(r => console.warn("[Privacy Redirect] Error updating allow list"));
     }
 
 };
 
 try {
     privacyRedirect.init();
+
+    // Update list of domains to skip processing
+    // They are known to break due to missing referrer.
+    privacyRedirect.updateAllowedList();
+
+    // Update the list every 30 mins
+    setInterval(function () {
+        privacyRedirect.updateAllowedList();
+    }, 30 * 60 * 1000);
 } catch (e) {
     console.warn(`[Privacy Redirect] Error Loading: ${e}`);
 }

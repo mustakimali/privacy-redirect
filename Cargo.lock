@@ -1483,6 +1483,7 @@ dependencies = [
  "blake3",
  "chrono",
  "html-escape",
+ "lazy_static",
  "libhoney-rust",
  "opentelemetry",
  "opentelemetry-prometheus",

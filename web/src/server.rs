@@ -28,6 +28,10 @@ pub(crate) async fn start() -> anyhow::Result<()> {
 
 fn register_handlers(cfg: &mut ServiceConfig) {
     cfg.route("/", web::get().to(handlers::redirect))
+        .route(
+            "/api/v1/allowed-list",
+            web::get().to(handlers::allowed_list),
+        )
         .route("/api/v1/healthcheck", web::get().to(handlers::health));
 }
 

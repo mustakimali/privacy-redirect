@@ -6,6 +6,10 @@ use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, Registry};
 
+lazy_static::lazy_static! {
+    pub(crate) static ref ALLOWED_LIST: Vec<&'static str> = vec!["okta.com"];
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     init_tracing();
