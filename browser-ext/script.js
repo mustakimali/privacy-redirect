@@ -3,6 +3,7 @@ const privacyRedirect = {
     SERVER_PREFIX: "https://privacydir.com/?",
 
     ALLOWED_LIST_GLOBAL: [],
+    RECENT_PROCESSES: {},
 
     init: function () {
         var isExtension = false;
@@ -18,6 +19,10 @@ const privacyRedirect = {
             // Page Script
             privacyRedirect.initPageScript();
         }
+
+        setInterval(() => {
+            privacyRedirect.RECENT_PROCESSES = {};
+        }, 2000);
 
         console.log(`[Privacy Redirect] ${isExtension ? "Extension " : ""}Loaded and protecting your privacy (${this.SERVER})`);
 
@@ -70,6 +75,7 @@ const privacyRedirect = {
             return {};
         }
 
+        // Skip processing if the domain is in the allow list
         const allowed = privacyRedirect.getAllowedList();
         const urlParam = new URL(url);
         for (var i = 0; i < allowed.length; i++) {
@@ -79,10 +85,16 @@ const privacyRedirect = {
             }
         }
 
+        // Skip processing repeated requests, it usually means redirect loop
+        if (privacyRedirect.RECENT_PROCESSES[url] != undefined) {
+            return {};
+        }
+
         var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
 
         if (url != redirected) {
             console.log(`Processing: ${url}`);
+            privacyRedirect.RECENT_PROCESSES[url] = true;
             return { redirectUrl: redirected };
         } else {
             return {};
