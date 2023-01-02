@@ -29,7 +29,6 @@ const privacyRedirect = {
     },
     initPageScript: function () {
         document.querySelector("body").addEventListener("click", function (event) {
-            console.log(event);
             var node = event.target;
             while (node != null) {
                 if (node == null) return;
@@ -40,7 +39,6 @@ const privacyRedirect = {
 
             const newUrl = privacyRedirect.processUrl(node.href, window.location.origin);
             if (node.href != newUrl) {
-                console.log(`Processing: ${node.href}`);
                 node.href = newUrl;
             }
         });
@@ -80,7 +78,7 @@ const privacyRedirect = {
         const urlParam = new URL(url);
         for (var i = 0; i < allowed.length; i++) {
             if (urlParam.hostname.indexOf(allowed[i]) >= 0) {
-                console.log(`Skipped Processing: ${url}`);
+                // Skip: Found on allow list
                 return {};
             }
         }
@@ -93,7 +91,7 @@ const privacyRedirect = {
         var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
 
         if (url != redirected) {
-            console.log(`Processing: ${url}`);
+            // Redirect
             privacyRedirect.RECENT_PROCESSES[url] = true;
             return { redirectUrl: redirected };
         } else {

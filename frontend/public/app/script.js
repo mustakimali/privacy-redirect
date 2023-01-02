@@ -3,6 +3,7 @@ const privacyRedirect = {
     SERVER_PREFIX: "https://privacydir.com/?",
 
     ALLOWED_LIST_GLOBAL: [],
+    RECENT_PROCESSES: {},
 
     init: function () {
         var isExtension = false;
@@ -19,12 +20,15 @@ const privacyRedirect = {
             privacyRedirect.initPageScript();
         }
 
+        setInterval(() => {
+            privacyRedirect.RECENT_PROCESSES = {};
+        }, 2000);
+
         console.log(`[Privacy Redirect] ${isExtension ? "Extension " : ""}Loaded and protecting your privacy (${this.SERVER})`);
 
     },
     initPageScript: function () {
         document.querySelector("body").addEventListener("click", function (event) {
-            console.log(event);
             var node = event.target;
             while (node != null) {
                 if (node == null) return;
@@ -35,7 +39,6 @@ const privacyRedirect = {
 
             const newUrl = privacyRedirect.processUrl(node.href, window.location.origin);
             if (node.href != newUrl) {
-                console.log(`Processing: ${node.href}`);
                 node.href = newUrl;
             }
         });
@@ -70,19 +73,26 @@ const privacyRedirect = {
             return {};
         }
 
+        // Skip processing if the domain is in the allow list
         const allowed = privacyRedirect.getAllowedList();
         const urlParam = new URL(url);
         for (var i = 0; i < allowed.length; i++) {
             if (urlParam.hostname.indexOf(allowed[i]) >= 0) {
-                console.log(`Skipped Processing: ${url}`);
+                // Skip: Found on allow list
                 return {};
             }
+        }
+
+        // Skip processing repeated requests, it usually means redirect loop
+        if (privacyRedirect.RECENT_PROCESSES[url] != undefined) {
+            return {};
         }
 
         var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
 
         if (url != redirected) {
-            console.log(`Processing: ${url}`);
+            // Redirect
+            privacyRedirect.RECENT_PROCESSES[url] = true;
             return { redirectUrl: redirected };
         } else {
             return {};

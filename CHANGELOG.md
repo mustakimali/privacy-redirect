@@ -10,3 +10,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * feat(web): added `/api/v1/allowed-list` to return list of known domains that breaks due to hiding referrer.
 * feat(ext): release: `v0.1.3` to download the list and skip processing those domains. The list is periodically updated.
 * fix(ext): release: `v0.1.4` fixes infinite loop with facebook container (ff)
+* chore(ext): release: `v0.1.5` disable all console logging
