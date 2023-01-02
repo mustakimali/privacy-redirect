@@ -29,7 +29,9 @@ Please send PR to:
 
 ## Submit Bug Report
 
-Please create a new issue or submit your feedback using [this form](https://forms.gle/xd5XFT6JHRTvvwqY6).
+If a site is broken then it's likely because it depends on the referrer to function properly (what a nightmare!). In this case you can add this domain to the global allow list [here](web/src/main.rs#L10). In the future this list can be managed from the extension itself.
+
+Please create a new issue in Github or submit your feedback using [this form](https://forms.gle/xd5XFT6JHRTvvwqY6).
 
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="60" />](https://www.buymeacoffee.com/mustak.im)
 
@@ -38,5 +40,5 @@ Please create a new issue or submit your feedback using [this form](https://form
 This service is meant to protect- not invade your privacy. It doesn't track your browsing history. The source code is public as a proof.
 
 ## To Do
-- [x] Browser Extension (in progress) (Firefox: Submitted for review, Chrome: WIP)
-- [ ] Tracing using honeycomb to monitor performance
+- [x] Browser Extension (Firefox: Released and maintained, Chrome: WIP)
+- [ ] Tracing using honeycomb to monitor performance (broken)

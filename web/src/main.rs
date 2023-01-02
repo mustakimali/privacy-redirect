@@ -7,7 +7,9 @@ use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, Registry};
 
 lazy_static::lazy_static! {
-    pub(crate) static ref ALLOWED_LIST: Vec<&'static str> = vec!["okta.com"];
+    pub(crate) static ref ALLOWED_LIST: Vec<&'static str> = vec![
+        "okta.com"
+    ];
 }
 
 #[actix_web::main]
