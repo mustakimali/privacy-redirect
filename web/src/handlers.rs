@@ -1,7 +1,4 @@
-use actix_web::{
-    http::{header, StatusCode},
-    HttpResponse, Responder,
-};
+use actix_web::{http::StatusCode, HttpResponse, Responder};
 use serde_json::json;
 
 #[derive(thiserror::Error, Debug)]
@@ -101,20 +98,6 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     HttpResponse::TemporaryRedirect()
         .append_header(("Location", "/app"))
         .finish()
-}
-
-pub async fn referrer(req: actix_web::HttpRequest) -> impl Responder {
-    let r = match req
-        .headers()
-        .get(header::REFERER)
-        .and_then(|r| r.to_str().ok())
-        .map(|r| r.to_string())
-    {
-        Some(rfr) => HttpResponse::Ok().body(json!({ "referrer": rfr }).to_string()),
-        None => HttpResponse::NotFound().finish(),
-    };
-
-    r
 }
 
 fn hash(input: &str) -> String {

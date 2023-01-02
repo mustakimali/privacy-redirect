@@ -14,6 +14,8 @@ anyhow = "1.0.67"
 thiserror = "1.0.38"
 tracing = "0.1.19"
 opentelemetry = { version = "0.18", features = ["rt-tokio-current-thread"] }
+opentelemetry-prometheus = "0.11.0"
+actix-web-opentelemetry = { version = "0.13.0", features = ["metrics-prometheus"]}
 tracing-opentelemetry = { version = "0.18" }
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 tracing-bunyan-formatter = "0.3"
