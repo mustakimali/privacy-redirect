@@ -8,7 +8,7 @@ use tracing_subscriber::{EnvFilter, Registry};
 
 lazy_static::lazy_static! {
     pub(crate) static ref ALLOWED_LIST: Vec<&'static str> = vec![
-        "okta.com"
+        "okta.com", "aws.amazon.com"
     ];
 }
 
