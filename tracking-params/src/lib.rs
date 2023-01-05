@@ -287,10 +287,6 @@ mod tests {
         "https://example.com/my-post?utm_xyx=abc&id=12456&utm_life=asssc",
         "https://example.com/my-post?id=12456"; "misc: all utm_ query (two)"
     )]
-    // #[test_case(
-    //     "https://href.li/?https://whatsmyreferer.com/?utm_campaign=twsrc^dUmBgUY",
-    //     "https://href.li/?https://whatsmyreferer.com/?utm_campaign=twsrc^dUmBgUY"; "misc: href.li"
-    // )]
     #[test_case(
         "https://whatsmyreferer.com/?json",
         "https://whatsmyreferer.com/?json"; "misc: no trailing eq ="
@@ -307,7 +303,27 @@ mod tests {
         "https://www.google.com/url?q=http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/&sa=D&source=calendar&usd=2&usg=AOvVaw0DUKL0RoiXBhCFMYU_U2jY",
         "http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/"; "google result: no url query string"
     )]
-    fn google(input: &str, expected: &str) {
+    #[test_case(
+        "https://www.google.com/url?sa=t&rct=j&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&q=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFnE9c5S1DUp0",
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer"; "google result: has q query string"
+    )]
+    #[test_case(
+        "https://www.google.com/url?sa=t&rct=j&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&q=invalid_url&q=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFnE9c5S1DUp0",
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer"; "google result: has two q query strings"
+    )]
+    #[test_case(
+        "https://www.google.com/url?sa=t&rct=j&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&q=invalid_url&q=https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer",
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer"; "google result: has two q query strings + unencoded value"
+    )]
+    #[test_case(
+        "https://www.youtube.com/redirect?event=channel_description&redir_token=JWT_TOKEN&q=https%3A%2F%2Fwww.britishairways.com",
+        "https://www.britishairways.com/"; "youtube /redirect: parses q"
+    )]
+    #[test_case(
+        "https://www.youtube.com/redirect?event=channel_description&redir_token=JWT_TOKEN&q=invalid_url",
+        "https://www.youtube.com/redirect?event=channel_description&redir_token=JWT_TOKEN&q=invalid_url"; "youtube /redirect: ingnores invalid q"
+    )]
+    fn site_specific(input: &str, expected: &str) {
         test_common(input, expected)
     }
 

@@ -118,7 +118,7 @@ lazy_static::lazy_static! {
                 Contains("feature"),
                 Contains("kw"),
             ],
-            handler: None
+            handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["q"], Some(vec!["redirect" ]))))
         },
         // https://community.spotify.com/t5/Desktop-Windows/si-Parameter-in-Spotify-URL-s/td-p/4538290
         Rule {
@@ -217,16 +217,36 @@ lazy_static::lazy_static! {
 /// We can extract the outgoing link (from a query string `url` or `q` whichever is present)
 /// and redirect there directly.
 fn handle_google(url: Url) -> Url {
-    match url.query_pairs().find(|(k, _)| k.eq("url")) {
-        Some((_, actual_url)) => urlencoding::decode(&actual_url)
-            .map_err(anyhow::Error::from)
-            .and_then(|decoded| Url::parse(&decoded).map_err(anyhow::Error::from))
-            .unwrap_or(url),
-        None => match url.query_pairs().find(|(k, _)| k.eq("q")) {
-            Some((_, q)) => url::Url::parse(&q).unwrap_or(url),
-            None => url,
-        },
+    extract_link_from_query_string(url, vec!["q", "url"], None)
+}
+
+/// Given a `url` extract a valid link from the query string `query`.
+///
+/// Optionally specify list of path components that much mach
+/// before extracting the links.
+fn extract_link_from_query_string(
+    url: Url,
+    queries: Vec<&'static str>,
+    path_match: Option<Vec<&'static str>>,
+) -> Url {
+    if let Some(path_match) = path_match {
+        if !path_match.iter().all(|p| url.path().contains(p)) {
+            return url;
+        }
     }
+    for query in queries {
+        for (_, possible_url) in url.query_pairs().filter(|(k, _)| k.eq(query)) {
+            if let Some(found_url) = urlencoding::decode(&possible_url)
+                .map_err(anyhow::Error::from)
+                .and_then(|decoded| Url::parse(&decoded).map_err(anyhow::Error::from)) // must be valid url,
+                .ok()
+            {
+                return found_url;
+            }
+        }
+    }
+
+    url
 }
 
 #[test]
