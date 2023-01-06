@@ -5,8 +5,9 @@ import validUrl from "valid-url"
 import getForFirefox from './get-the-addon-fx-apr-2020.svg'
 
 function App() {
+  const defaultUrl = "https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY";
   const [state, setState] = useState({
-    url: "https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY",
+    url: defaultUrl,
     cleaned: "",
     json: ""
   });
@@ -33,7 +34,7 @@ function App() {
   }
 
   useEffect(() => {
-    updateResult({ target: { value: state.url } });
+    updateResult({ target: { value: defaultUrl } });
   }, []);
 
   return (
@@ -50,7 +51,7 @@ function App() {
           </p>
           <div>
             <a href="https://addons.mozilla.org/en-US/firefox/addon/privacydir/">
-              <img src={getForFirefox} width="150px" />
+              <img src={getForFirefox} width="150px" alt="Get Firefox Addon" />
             </a>
           </div>
 
@@ -70,7 +71,7 @@ function App() {
           <form>
             <div style={{ fontSize: 'x-large' }}>
               <p>
-                <a href={SERVER + '/?' + state.url} target="_blank" className='previewLink'>
+                <a href={SERVER + '/?' + state.url} target="_blank" className='previewLink' rel='noreferrer'>
                   <span id="host">{SERVER}/</span>?<span id="orgUrl">{state.url}</span>
                 </a>
               </p>
@@ -104,7 +105,7 @@ function App() {
         <span>
           Made with 💙 and 🦀 by  <a href="https://mustak.im">Mohammad Mustakim Ali</a>
         </span>
-        <a href="https://www.buymeacoffee.com/mustak.im" target="_blank">
+        <a href="https://www.buymeacoffee.com/mustak.im" target="_blank" rel='noreferrer'>
           <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50px" style={{ margin: "10px" }} />
         </a>
       </div>
