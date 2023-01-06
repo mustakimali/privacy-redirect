@@ -33,7 +33,7 @@ pub fn init_tracing(service_name: &str) {
                     .with_http_client(reqwest::Client::default())
                     .with_headers(HashMap::from([
                         ("x-honeycomb-dataset".into(), service_name.into()),
-                        ("x-honeycomb-team".into(), api_key.into()),
+                        ("x-honeycomb-team".into(), api_key),
                     ]))
                     .with_timeout(std::time::Duration::from_secs(2)),
             ) // Replace with runtime::Tokio if using async main

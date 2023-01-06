@@ -1,0 +1,26 @@
+name: Fly Deploy
+on:
+  push:
+    branches:
+      - "main"
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+concurrency:
+  group: fly-production
+  cancel-in-progress: true
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy
+  first-run-check:
+    name: First run experience check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: First run experience
+        run: ./build.sh && cargo check

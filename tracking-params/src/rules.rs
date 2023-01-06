@@ -236,10 +236,10 @@ fn extract_link_from_query_string(
     }
     for query in queries {
         for (_, possible_url) in url.query_pairs().filter(|(k, _)| k.eq(query)) {
-            if let Some(found_url) = urlencoding::decode(&possible_url)
+            if let Ok(found_url) = urlencoding::decode(&possible_url)
                 .map_err(anyhow::Error::from)
-                .and_then(|decoded| Url::parse(&decoded).map_err(anyhow::Error::from)) // must be valid url,
-                .ok()
+                .and_then(|decoded| Url::parse(&decoded).map_err(anyhow::Error::from))
+            // must be valid url,
             {
                 return found_url;
             }
