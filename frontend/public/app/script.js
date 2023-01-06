@@ -4,15 +4,13 @@ const privacyRedirect = {
 
     ALLOWED_LIST_GLOBAL: [],
     RECENT_PROCESSES: {},
+    ALLOW_INTERNAL_REDIRECTS: [],
 
     init: function () {
         var isExtension = false;
-        if (navigator.userAgent.indexOf("Firefox") >= 0 && (typeof chrome === "object" || typeof browser === "object")) {
+        if (typeof chrome === "object") {
             // Browser Extension
-            let inst = typeof chrome === "object" ? chrome : browser;
-            isExtension = true;
-
-            inst.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
+            chrome.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
                 urls: ["<all_urls>"]
             }, ["blocking"]);
         } else {
@@ -48,7 +46,7 @@ const privacyRedirect = {
 
         if (
             url.startsWith("http")
-            && (!url.startsWith(origin)) // different site and has query string
+            && (origin == null || !url.startsWith(origin)) // different site and has query string
         ) {
             url = this.SERVER_PREFIX + url;
         }
@@ -63,6 +61,10 @@ const privacyRedirect = {
     },
     handleRedirectInner: function (requestDetails) {
         if (requestDetails.method !== "GET") {
+            return {};
+        }
+
+        if (requestDetails.type !== "main_frame" && requestDetails.type !== "sub_frame") {
             return {};
         }
         var url = requestDetails.url;
@@ -85,12 +87,14 @@ const privacyRedirect = {
 
         // Skip processing repeated requests, it usually means redirect loop
         if (privacyRedirect.RECENT_PROCESSES[url] != undefined) {
+            console.warn("Duplicate request: " + url);
             return {};
         }
 
-        var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
+        //var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
+        var redirected = privacyRedirect.processUrl(url, null);
 
-        if (url != redirected) {
+        if (url !== redirected) {
             // Redirect
             privacyRedirect.RECENT_PROCESSES[url] = true;
             return { redirectUrl: redirected };

@@ -107,5 +107,11 @@ pub async fn allowed_list(_req: actix_web::HttpRequest) -> impl Responder {
     HttpResponse::Ok()
         .append_header(("cache-control", "public, max-age=300"))
         .append_header(("content-type", "application/json"))
-        .body(json!({ "result": super::ALLOWED_LIST.to_vec() }).to_string())
+        .body(
+            json!({
+                "result": super::ALLOWED_LIST.to_vec(),
+                "internal_redirect": super::ALLOWED_REGEX_FOR_INTERNAL_REDIRECT.to_vec()
+            })
+            .to_string(),
+        )
 }

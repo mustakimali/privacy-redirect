@@ -4,15 +4,13 @@ const privacyRedirect = {
 
     ALLOWED_LIST_GLOBAL: [],
     RECENT_PROCESSES: {},
+    ALLOW_INTERNAL_REDIRECTS: [],
 
     init: function () {
         var isExtension = false;
-        if (navigator.userAgent.indexOf("Firefox") >= 0 && (typeof chrome === "object" || typeof browser === "object")) {
+        if (typeof chrome === "object") {
             // Browser Extension
-            let inst = typeof chrome === "object" ? chrome : browser;
-            isExtension = true;
-
-            inst.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
+            chrome.webRequest.onBeforeRequest.addListener(privacyRedirect.handleRedirect, {
                 urls: ["<all_urls>"]
             }, ["blocking"]);
         } else {
@@ -48,7 +46,7 @@ const privacyRedirect = {
 
         if (
             url.startsWith("http")
-            && (!url.startsWith(origin)) // different site and has query string
+            && (origin == null || !url.startsWith(origin)) // different site and has query string
         ) {
             url = this.SERVER_PREFIX + url;
         }
@@ -65,13 +63,17 @@ const privacyRedirect = {
         if (requestDetails.method !== "GET") {
             return {};
         }
+
+        if (requestDetails.type !== "main_frame" && requestDetails.type !== "sub_frame") {
+            return {};
+        }
         var url = requestDetails.url;
         var origin = requestDetails.originUrl;
 
-        if (requestDetails.documentUrl != undefined
-            || (origin != undefined && origin.startsWith(privacyRedirect.SERVER))) {
-            return {};
-        }
+        // if (requestDetails.documentUrl != undefined
+        //     || (origin != undefined && origin.startsWith(privacyRedirect.SERVER))) {
+        //     return {};
+        // }
 
         // Skip processing if the domain is in the allow list
         const allowed = privacyRedirect.getAllowedList();
@@ -90,13 +92,23 @@ const privacyRedirect = {
 
         var redirected = privacyRedirect.processUrl(url, origin == undefined ? null : new URL(origin).origin);
 
-        if (url != redirected) {
+        if (url !== redirected) {
             // Redirect
             privacyRedirect.RECENT_PROCESSES[url] = true;
             return { redirectUrl: redirected };
-        } else {
-            return {};
+        } else if (!redirected.startsWith(privacyRedirect.SERVER_PREFIX) && urlParam.search !== "") {
+            // internal redirect but there's a query string
+            // only process if this is allowed
+
+            if (privacyRedirect.ALLOW_INTERNAL_REDIRECTS.find(reg => url.match(reg)) !== undefined) {
+                redirected = privacyRedirect.processUrl(url, null);
+                return {
+                    redirectUrl: redirected
+                };
+            }
         }
+
+        return {};
     },
     getAllowedList: function () {
         return privacyRedirect.ALLOWED_LIST_GLOBAL;
@@ -107,6 +119,7 @@ const privacyRedirect = {
             .then(r => {
                 const list = r.result;
                 privacyRedirect.ALLOWED_LIST_GLOBAL = list;
+                privacyRedirect.ALLOW_INTERNAL_REDIRECTS = r.internal_redirect.map(rg => new RegExp(rg));
 
                 console.log("The following domains will be skipped as they are known to break due to missing referrer.: " + JSON.stringify(list));
             }).catch(r => console.warn("[Privacy Redirect] Error updating allow list"));

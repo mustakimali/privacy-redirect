@@ -6,6 +6,9 @@ lazy_static::lazy_static! {
     pub(crate) static ref ALLOWED_LIST: Vec<&'static str> = vec![
         "okta.com", "aws.amazon.com"
     ];
+    pub(crate) static ref ALLOWED_REGEX_FOR_INTERNAL_REDIRECT: Vec<&'static str> = vec![
+        "google.*/url"
+    ];
 }
 
 #[actix_web::main]
