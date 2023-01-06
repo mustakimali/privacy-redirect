@@ -48,6 +48,8 @@ pub fn init_tracing(service_name: &str) {
     }
 }
 
+/// A Trace Logger that replaces the field `http.target` with its hash
+/// so that the server doesn't log any query string.
 pub type PrivacyFriendlyTraceLogger =
     tracing_actix_web::TracingLogger<PrivacyFriendlyRootSpanBuilder>;
 

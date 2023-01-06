@@ -46,14 +46,13 @@ window.opener = null; window.location.replace("$$URL_ESCAPED$$" + window.locatio
 
 #[tracing::instrument(
     skip(req),
-    fields(input_hash = "", cleaned = false, json = false, http.header.ip = ""))]
+    fields(cleaned = false, json = false, http.header.ip = ""))]
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     let input_url = req.query_string().to_string();
     let input_url = urlencoding::decode(&input_url)
         .map(|r| r.to_string())
         .unwrap_or_else(|_| input_url);
 
-    tracing::Span::current().record("input_hash", super::tracing::hash(&input_url));
     if let Some((_, cf_header)) = req
         .headers()
         .iter()
