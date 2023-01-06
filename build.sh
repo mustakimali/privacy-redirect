@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu pipefail
 
 mkdir static && cd frontend && npm -i g yarn && yarn install && yarn build && cd ..
 echo

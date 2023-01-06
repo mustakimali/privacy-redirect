@@ -1,0 +1,30 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+name: Test
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./build.sh
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            target
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
+      - run: cargo test
+      - run: cargo test --doc

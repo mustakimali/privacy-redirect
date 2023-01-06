@@ -3,12 +3,8 @@ use actix_web::{
     web::{self, ServiceConfig},
     App, HttpServer,
 };
-use actix_web_opentelemetry::{PrometheusMetricsHandler, RequestMetricsBuilder, RequestTracing};
+use actix_web_prometheus::PrometheusMetricsBuilder;
 use chrono::Utc;
-use opentelemetry::sdk::{
-    export::metrics::aggregation,
-    metrics::{controllers, processors, selectors},
-};
 use tracing::info;
 
 use crate::handlers;
@@ -38,7 +34,11 @@ fn register_handlers(cfg: &mut ServiceConfig) {
 async fn start_server(addr: String) -> anyhow::Result<()> {
     info!("Starting server on {}", addr);
 
-    let (metrics_handler, request_metrics) = init_metrics();
+    //let (metrics_handler, request_metrics) = init_metrics();
+    let prometheus = PrometheusMetricsBuilder::new("api")
+        .endpoint("/metrics")
+        .build()
+        .expect("build prometheus builderal");
 
     HttpServer::new(move || {
         App::new()
@@ -72,10 +72,9 @@ async fn start_server(addr: String) -> anyhow::Result<()> {
                     Ok(res)
                 }
             })
+            .wrap(prometheus.clone())
             .wrap(actix_web::middleware::Compress::default())
-            .route("/metrics", web::get().to(metrics_handler.clone()))
-            .wrap(RequestTracing::new())
-            .wrap(request_metrics.clone())
+            .wrap(super::tracing::PrivacyFriendlyTraceLogger::new())
             .service(actix_files::Files::new("/app", "./static").index_file("index.html"))
             .configure(register_handlers)
     })
@@ -85,26 +84,4 @@ async fn start_server(addr: String) -> anyhow::Result<()> {
     .await?;
 
     Ok(())
-}
-
-fn init_metrics() -> (
-    PrometheusMetricsHandler,
-    actix_web_opentelemetry::RequestMetrics,
-) {
-    let metrics_handler = {
-        let controller = controllers::basic(
-            processors::factory(
-                selectors::simple::histogram([1.0, 2.0, 5.0, 10.0, 20.0, 50.0]),
-                aggregation::cumulative_temporality_selector(),
-            )
-            .with_memory(true),
-        )
-        .build();
-
-        let exporter = opentelemetry_prometheus::exporter(controller).init();
-        PrometheusMetricsHandler::new(exporter)
-    };
-    let meter = opentelemetry::global::meter("actix_web");
-    let request_metrics = RequestMetricsBuilder::new().build(meter);
-    (metrics_handler, request_metrics)
 }
