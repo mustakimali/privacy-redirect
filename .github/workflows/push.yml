@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: ./build.sh
       - run: cargo check --all-targets
       - run: cargo clippy
       - run: cargo test
@@ -25,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: ./build.sh
       - run: cargo test
       - run: cargo test --doc
 
@@ -32,6 +34,7 @@ jobs:
     name: coverage
     runs-on: ubuntu-latest
     steps:
+    - run: ./build.sh
     - name: Generate test result and coverage report
       run: |
           cargo install cargo2junit grcov rust-covfix;
