@@ -57,12 +57,17 @@ pub struct PrivacyFriendlyRootSpanBuilder;
 
 impl RootSpanBuilder for PrivacyFriendlyRootSpanBuilder {
     fn on_request_start(request: &ServiceRequest) -> Span {
+        let level = if request.path() == "/api/v1/healthcheck" {
+            tracing::Level::DEBUG
+        } else {
+            tracing::Level::INFO
+        };
         let target = request
             .uri()
             .path_and_query()
             .map(|p| p.as_str())
             .unwrap_or("");
-        tracing_actix_web::root_span!(request, http.target = hash(target))
+        tracing_actix_web::root_span!(level = level, request, http.target = hash(target))
     }
 
     fn on_request_end<B: MessageBody>(span: Span, response: &Result<ServiceResponse<B>, Error>) {

@@ -38,6 +38,8 @@ WORKDIR app
 ENV TZ=Etc/UTC
 ENV RUST_LOG=info
 
+RUN apt-get update -y && apt-get install ca-certificates -y
+
 COPY --from=builder /app/target/release/privacy-redirect /app
 COPY --from=frontend-builder /app/build /app/static
 COPY browser-ext/script.js /app/static/script.js
