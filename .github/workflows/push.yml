@@ -34,6 +34,7 @@ jobs:
     name: coverage
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - run: ./build.sh
     - name: Generate test result and coverage report
       run: |
