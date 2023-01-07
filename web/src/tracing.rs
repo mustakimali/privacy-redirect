@@ -57,7 +57,7 @@ pub struct PrivacyFriendlyRootSpanBuilder;
 
 impl RootSpanBuilder for PrivacyFriendlyRootSpanBuilder {
     fn on_request_start(request: &ServiceRequest) -> Span {
-        let level = if request.path() == "/api/v1/healthcheck" {
+        let level = if request.path() == "/api/v1/healthcheck" || request.path() == "/metrics" {
             tracing::Level::DEBUG
         } else {
             tracing::Level::INFO
