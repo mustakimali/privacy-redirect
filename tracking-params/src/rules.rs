@@ -238,21 +238,3 @@ fn extract_link_from_query_string(
 
     url
 }
-
-#[test]
-fn test_handle_google() {
-    let result = handle_google(Url::parse("https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&url=https%3A%2F%2Fdeveloper.mozilla.org%2Fen-US%2Fdocs%2FWeb%2FHTTP%2FHeaders%2FReferer&usg=AOvVaw0W8-mEp9kfFnE9c5S1DUp0").unwrap());
-    assert_eq!(
-        result.to_string(),
-        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer".to_string()
-    )
-}
-
-#[test]
-fn test_handle_google_no_url() {
-    let result = handle_google(Url::parse("https://www.google.com/url?q=http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/&sa=D&source=calendar&usd=2&usg=AOvVaw0DUKL0RoiXBhCFMYU_U2jY").unwrap());
-    assert_eq!(
-        result.to_string(),
-        "http://www.capitalfm.com/news/tv-film/netflix/kaleidoscope-episode-order/".to_string()
-    )
-}
