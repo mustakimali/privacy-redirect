@@ -39,7 +39,7 @@ lazy_static::lazy_static! {
                 Exact("sr"),
                 Exact("tag"),
             ],
-            handler: None
+            handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["U"], Some(vec!["gp/r.html" ]))))
         },
         Rule {
             domains: vec![Contains("bing")],
@@ -70,7 +70,7 @@ lazy_static::lazy_static! {
             params: vec![
                 Exact("usg"),
             ],
-            handler: Some(Box::new(handle_google)),
+            handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["q", "url"], None))),
         },
 
         Rule {
@@ -208,16 +208,6 @@ lazy_static::lazy_static! {
 
     ];
 
-}
-
-/// When you click on a search result on gooogle,
-/// It redirects to `/url?....` path with some tracking parameters.
-///
-/// We can do better than just removing the tracking parameters.
-/// We can extract the outgoing link (from a query string `url` or `q` whichever is present)
-/// and redirect there directly.
-fn handle_google(url: Url) -> Url {
-    extract_link_from_query_string(url, vec!["q", "url"], None)
 }
 
 /// Given a `url` extract a valid link from the query string `query`.

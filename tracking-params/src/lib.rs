@@ -21,8 +21,30 @@ mod rules;
 #[derive(Derivative)]
 #[derivative(Debug)]
 pub(crate) struct Rule {
+    /// List of domains for which this rule applies.
     domains: Vec<M>,
+    /// List of query string and fragment params to remove.
     params: Vec<M>,
+    /// Handler to run any specific code for this rule.
+    ///
+    /// When defined, the handler run run before removing the matching
+    /// params from the input url (defined in `params` field).
+    /// The handler can change or return a completely different Url.
+    /// Note: the handler is expected (although not validated for perf reason)
+    /// to return url that belongs to the same origin and treated as such because
+    /// * any matching params will still be removed later even if it's a different origin.
+    /// * any defined rule for that new origin won't be applied
+    ///
+    /// A common use for handler function is to extract destination url from a query string
+    /// from the input url. Consider the following link when click on a google search result:
+    ///
+    /// `https://www.google.com/url?sa=t&rct=j&esrc=s&source=web&cd=&ved=2ahUKEwi8hMv_nKP8AhWXhFwKHSetARUQFnoECBgQAQ&q=invalid_url&q=https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer`
+    ///
+    /// We can extract the destination url from the `q` or `url` query string (whichever is present)
+    /// and skip sending traffic to `/url` endpoint. For such cases you can use
+    /// the defined [`rules::extract_link_from_query_string`] function to extract valid url
+    /// from one or many query strings.
+    ///
     #[derivative(Debug = "ignore")]
     handler: Option<Box<dyn Fn(Url) -> Url + Sync + Send>>,
 }
@@ -322,6 +344,10 @@ mod tests {
     #[test_case(
         "https://www.youtube.com/redirect?event=channel_description&redir_token=JWT_TOKEN&q=invalid_url",
         "https://www.youtube.com/redirect?event=channel_description&redir_token=JWT_TOKEN&q=invalid_url"; "youtube /redirect: ingnores invalid q"
+    )]
+    #[test_case(
+        "https://www.amazon.co.uk/gp/r.html?C=HEX&K=SOMEHEX&M=urn:rtn:msg:NUMBERS&R=SOMETHING&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fyour-account%2Forder-details%3ForderID%3DOREDER_ID%26ref_%3Dpreference&H=TEXT&ref_=pe_ref_with_underscore",
+        "https://www.amazon.co.uk/gp/your-account/order-details?orderID=OREDER_ID&ref_=preference"; "amazon: extract from U"
     )]
     fn site_specific(input: &str, expected: &str) {
         test_common(input, expected)
