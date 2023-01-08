@@ -52,7 +52,7 @@ dependencies = [
  "actix-rt",
  "actix-service",
  "actix-utils",
- "ahash",
+ "ahash 0.7.6",
  "base64",
  "bitflags",
  "brotli",
@@ -166,7 +166,7 @@ dependencies = [
  "actix-service",
  "actix-utils",
  "actix-web-codegen",
- "ahash",
+ "ahash 0.7.6",
  "bytes",
  "bytestring",
  "cfg-if",
@@ -205,22 +205,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-web-opentelemetry"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aaa592a5b9b3d96101434bca1024c6da6c23630163aec485428e613cd7100dcf"
-dependencies = [
- "actix-http",
- "actix-web",
- "futures-util",
- "opentelemetry 0.18.0",
- "opentelemetry-prometheus",
- "opentelemetry-semantic-conventions",
- "prometheus",
- "serde",
-]
-
-[[package]]
 name = "actix-web-prometheus"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -247,6 +231,18 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcb51a0695d8f838b1ee009b3fbf66bda078cd64590202a864a8f3e8c4315c47"
 dependencies = [
+ "getrandom",
+ "once_cell",
+ "version_check",
+]
+
+[[package]]
+name = "ahash"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf6ccdb167abbf410dcb915cabd428929d7f6a04980b54a11f26a39f1c7f7107"
+dependencies = [
+ "cfg-if",
  "getrandom",
  "once_cell",
  "version_check",
@@ -684,9 +680,9 @@ dependencies = [
 
 [[package]]
 name = "cxx"
-version = "1.0.85"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5add3fc1717409d029b20c5b6903fc0c0b02fa6741d820054f4a2efa5e5816fd"
+checksum = "51d1075c37807dcf850c379432f0df05ba52cc30f279c5cfc43cc221ce7f8579"
 dependencies = [
  "cc",
  "cxxbridge-flags",
@@ -696,9 +692,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-build"
-version = "1.0.85"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4c87959ba14bc6fbc61df77c3fcfe180fc32b93538c4f1031dd802ccb5f2ff0"
+checksum = "5044281f61b27bc598f2f6647d480aed48d2bf52d6eb0b627d84c0361b17aa70"
 dependencies = [
  "cc",
  "codespan-reporting",
@@ -711,32 +707,19 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-flags"
-version = "1.0.85"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69a3e162fde4e594ed2b07d0f83c6c67b745e7f28ce58c6df5e6b6bef99dfb59"
+checksum = "61b50bc93ba22c27b0d31128d2d130a0a6b3d267ae27ef7e4fae2167dfe8781c"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "1.0.85"
+version = "1.0.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e7e2adeb6a0d4a282e581096b06e1791532b7d576dcde5ccd9382acf55db8e6"
+checksum = "39e61fda7e62115119469c7b3591fd913ecca96fb766cfd3f2e2502ab7bc87a5"
 dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "dashmap"
-version = "5.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "907076dfda823b0b36d2a1bb5f90c96660a5bbcd7729e10727f07858f22c4edc"
-dependencies = [
- "cfg-if",
- "hashbrown",
- "lock_api",
- "once_cell",
- "parking_lot_core",
 ]
 
 [[package]]
@@ -907,17 +890,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "futures-macro"
-version = "0.3.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bdfb8ce053d86b91919aad980c220b1fb8401a9394410e1c289ed7e66b61835d"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "futures-sink"
 version = "0.3.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -938,7 +910,6 @@ dependencies = [
  "futures-channel",
  "futures-core",
  "futures-io",
- "futures-macro",
  "futures-sink",
  "futures-task",
  "memchr",
@@ -1034,15 +1005,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee512640fe35acbfb4bb779db6f0d80704c2cacfa2e39b601ef3e3f47d1ae4c7"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "html-escape"
-version = "0.2.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d1ad449764d627e22bfd7cd5e8868264fc9236e07c752972b4080cd351cb476"
-dependencies = [
- "utf8-width",
 ]
 
 [[package]]
@@ -1502,16 +1464,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "opentelemetry"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69d6c3d7288a106c0a363e4b0e8d308058d56902adefb16f4936f417ffef086e"
-dependencies = [
- "opentelemetry_api",
- "opentelemetry_sdk",
-]
-
-[[package]]
 name = "opentelemetry-http"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1520,7 +1472,7 @@ dependencies = [
  "async-trait",
  "bytes",
  "http",
- "opentelemetry 0.17.0",
+ "opentelemetry",
  "reqwest",
 ]
 
@@ -1534,7 +1486,7 @@ dependencies = [
  "futures",
  "futures-util",
  "http",
- "opentelemetry 0.17.0",
+ "opentelemetry",
  "opentelemetry-http",
  "prost",
  "prost-build",
@@ -1543,64 +1495,6 @@ dependencies = [
  "tokio",
  "tonic",
  "tonic-build",
-]
-
-[[package]]
-name = "opentelemetry-prometheus"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06c3d833835a53cf91331d2cfb27e9121f5a95261f31f08a1f79ab31688b8da8"
-dependencies = [
- "opentelemetry 0.18.0",
- "prometheus",
- "protobuf",
-]
-
-[[package]]
-name = "opentelemetry-semantic-conventions"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b02e0230abb0ab6636d18e2ba8fa02903ea63772281340ccac18e0af3ec9eeb"
-dependencies = [
- "opentelemetry 0.18.0",
-]
-
-[[package]]
-name = "opentelemetry_api"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c24f96e21e7acc813c7a8394ee94978929db2bcc46cf6b5014fc612bf7760c22"
-dependencies = [
- "fnv",
- "futures-channel",
- "futures-util",
- "indexmap",
- "js-sys",
- "once_cell",
- "pin-project-lite",
- "thiserror",
-]
-
-[[package]]
-name = "opentelemetry_sdk"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ca41c4933371b61c2a2f214bf16931499af4ec90543604ec828f7a625c09113"
-dependencies = [
- "async-trait",
- "crossbeam-channel",
- "dashmap",
- "fnv",
- "futures-channel",
- "futures-executor",
- "futures-util",
- "once_cell",
- "opentelemetry_api",
- "percent-encoding",
- "rand",
- "thiserror",
- "tokio",
- "tokio-stream",
 ]
 
 [[package]]
@@ -1744,18 +1638,14 @@ version = "0.1.0"
 dependencies = [
  "actix-files",
  "actix-web",
- "actix-web-opentelemetry",
  "actix-web-prometheus",
  "anyhow",
  "blake3",
  "chrono",
- "html-escape",
  "lazy_static",
- "opentelemetry 0.17.0",
+ "opentelemetry",
  "opentelemetry-otlp",
  "reqwest",
- "serde",
- "serde_derive",
  "serde_json",
  "thiserror",
  "tracing",
@@ -1812,7 +1702,6 @@ dependencies = [
  "lazy_static",
  "memchr",
  "parking_lot",
- "protobuf",
  "thiserror",
 ]
 
@@ -1868,12 +1757,6 @@ dependencies = [
  "bytes",
  "prost",
 ]
-
-[[package]]
-name = "protobuf"
-version = "2.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 
 [[package]]
 name = "quanta"
@@ -2577,10 +2460,11 @@ dependencies = [
 
 [[package]]
 name = "tracing-bunyan-formatter"
-version = "0.3.4"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2445962f94a813b2aaea29ceeccb6dce9fd3aa5b1cb45595cde755b00d021ad"
+checksum = "e6e1f01db95972374fa01ee6880105eb3b3867dacf87d3cccbac4bda9b8274b6"
 dependencies = [
+ "ahash 0.8.2",
  "gethostname",
  "log",
  "serde",
@@ -2630,7 +2514,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbbe89715c1dbbb790059e2565353978564924ee85017b5fff365c872ff6721f"
 dependencies = [
  "once_cell",
- "opentelemetry 0.17.0",
+ "opentelemetry",
  "tracing",
  "tracing-core",
  "tracing-log",
@@ -2738,12 +2622,6 @@ name = "urlencoding"
 version = "2.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8db7427f936968176eaa7cdf81b7f98b980b18495ec28f1b5791ac3bfe3eea9"
-
-[[package]]
-name = "utf8-width"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5190c9442dcdaf0ddd50f37420417d219ae5261bbf5db120d0f9bab996c9cba1"
 
 [[package]]
 name = "uuid"
