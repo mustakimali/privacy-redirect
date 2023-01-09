@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## 2022-1-9
-* feat(ext): release: `v0.1.6` new function `Cleaned::number_of_handlers_used`.
-* feat(ext): release: `v0.1.6` new function `clean_str_raw`.
+* feat(crate): release: `v0.1.6` new function `Cleaned::number_of_handlers_used`.
+* feat(crate): release: `v0.1.6` new function `clean_str_raw`.
 
 ## 2022-1-2
 

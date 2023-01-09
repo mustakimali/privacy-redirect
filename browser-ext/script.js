@@ -4,10 +4,12 @@ const privacyRedirect = {
 
     ALLOWED_LIST_GLOBAL: [],
     RECENT_PROCESSES: {},
+    isFirefox: false,
 
     init: function () {
         var isExtension = false;
-        if (navigator.userAgent.indexOf("Firefox") >= 0 && (typeof chrome === "object" || typeof browser === "object")) {
+        privacyRedirect.isFirefox = navigator.userAgent.indexOf("Firefox") >= 0;
+        if (typeof chrome === "object" || typeof browser === "object") {
             // Browser Extension
             let inst = typeof chrome === "object" ? chrome : browser;
             isExtension = true;
@@ -66,7 +68,13 @@ const privacyRedirect = {
             return {};
         }
         var url = requestDetails.url;
-        var origin = requestDetails.originUrl;
+        var origin = privacyRedirect.isFirefox ? requestDetails.originUrl : requestDetails.initiator;
+
+        if (!privacyRedirect.isFirefox) {
+            if (requestDetails.type != "main_frame") {
+                return {};
+            }
+        }
 
         if (requestDetails.documentUrl != undefined
             || (origin != undefined && origin.startsWith(privacyRedirect.SERVER))) {
@@ -109,7 +117,7 @@ const privacyRedirect = {
                 privacyRedirect.ALLOWED_LIST_GLOBAL = list;
 
                 console.log("The following domains will be skipped as they are known to break due to missing referrer.: " + JSON.stringify(list));
-            }).catch(r => console.warn("[Privacy Redirect] Error updating allow list"));
+            }).catch(r => console.warn("[Privacy Redirect] Error updating allow list: "+ r));
     }
 
 };

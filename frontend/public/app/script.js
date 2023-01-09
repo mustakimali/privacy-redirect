@@ -7,7 +7,7 @@ const privacyRedirect = {
 
     init: function () {
         var isExtension = false;
-        if (navigator.userAgent.indexOf("Firefox") >= 0 && (typeof chrome === "object" || typeof browser === "object")) {
+        if (typeof chrome === "object" || typeof browser === "object") {
             // Browser Extension
             let inst = typeof chrome === "object" ? chrome : browser;
             isExtension = true;
