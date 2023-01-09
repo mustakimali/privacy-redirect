@@ -32,16 +32,16 @@ const REDIRECT_HTML: &str = r#"
 <title>Privacy Redirect</title>
 <meta http-equiv="Refresh" content="0; url=$$URL$$" />
 <meta name="referrer" content="no-referrer" />
-</head>
-<body style="background-color: #000;color: #ccc;">
-<noscript>
-<p>Click to redirect:<br /><a href="$$URL$$">$$URL$$</a></p>
-</noscript>
 <script type="text/javascript">
 /* <![CDATA[ */
 window.opener = null; window.location.replace("$$URL_ESCAPED$$" + window.location.hash);
 /* ]]> */
 </script>
+</head>
+<body style="background-color: #000;color: #ccc;">
+<noscript>
+<p>Click to redirect:<br /><a href="$$URL$$">$$URL$$</a></p>
+</noscript>
 </body></html>"#;
 
 #[tracing::instrument(

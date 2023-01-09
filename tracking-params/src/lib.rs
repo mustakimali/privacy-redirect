@@ -22,7 +22,7 @@ mod rules;
 #[derivative(Debug)]
 pub(crate) struct Rule {
     /// List of domains for which this rule applies.
-    domains: Vec<M>,
+    host_path: Vec<M>,
     /// List of query string and fragment params to remove.
     params: Vec<M>,
     /// Handler to run any specific code for this rule.
@@ -134,7 +134,7 @@ pub fn clean(url: Url) -> Cleaned {
     );
     let matched_rules = rules::GLOBAL_PARAMS
         .iter()
-        .filter(|r| r.domains.iter().any(|d| d.matches_str(Some(&host_path))))
+        .filter(|r| r.host_path.iter().any(|d| d.matches_str(Some(&host_path))))
         .collect::<Vec<_>>();
 
     // Run ths url through any rules that has a handler defined
@@ -348,6 +348,10 @@ mod tests {
     #[test_case(
         "https://www.amazon.co.uk/gp/r.html?C=HEX&K=SOMEHEX&M=urn:rtn:msg:NUMBERS&R=SOMETHING&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fyour-account%2Forder-details%3ForderID%3DOREDER_ID%26ref_%3Dpreference&H=TEXT&ref_=pe_ref_with_underscore",
         "https://www.amazon.co.uk/gp/your-account/order-details?orderID=OREDER_ID&ref_=preference"; "amazon: extract from U"
+    )]
+    #[test_case(
+        "https://email.clearscore.com/uni/track?uid=UUID&txnid=UUID&bsft_aaid=UUID&eid=UUID&mid=UUID&bsft_ek=RANDOM&bsft_mime_type=html&bsft_tv=27&bsft_lx=9&a=click&redir=https%3A%2F%2Fapp.clearscore.com%2Freport%3Futm_campaign%3Deml_lc_ca_alerts_2021_02_09%26utm_source%3Dblueshift%26utm_medium%3Demail%26utm_content%3Deml_lc_alerts_new_template_2022_04_01",
+        "https://app.clearscore.com/report"; "generic email tracker: with track in path"
     )]
     fn site_specific(input: &str, expected: &str) {
         test_common(input, expected)
