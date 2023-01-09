@@ -106,19 +106,28 @@ impl M {
 ///
 
 #[derive(Debug, Clone)]
-pub struct Cleaned(Url);
+pub struct Cleaned {
+    result: Url,
+    handlers_used: i32,
+}
 
 impl std::ops::Deref for Cleaned {
     type Target = Url;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.result
+    }
+}
+
+impl Cleaned {
+    pub fn number_of_handlers_used(&self) -> i32 {
+        self.handlers_used
     }
 }
 
 impl ToString for Cleaned {
     fn to_string(&self) -> String {
-        self.0.as_ref().trim_end_matches('=').to_string()
+        self.result.as_ref().trim_end_matches('=').to_string()
     }
 }
 
@@ -126,6 +135,7 @@ impl ToString for Cleaned {
 ///
 /// This owns the input and returns a [`Cleaned`] type.
 pub fn clean(url: Url) -> Cleaned {
+    let mut handlers_used = 0;
     // Find applicable rules for this hostname
     let host_path = format!(
         "{}/{}",
@@ -144,13 +154,14 @@ pub fn clean(url: Url) -> Cleaned {
     for rule in rules_with_handles {
         if let Some(handler) = &rule.handler {
             url = handler(url);
+            handlers_used += 1;
         }
     }
 
-    Cleaned(clean_hash_params(
-        clean_query_string(url, &matched_rules),
-        &matched_rules,
-    ))
+    Cleaned {
+        result: clean_hash_params(clean_query_string(url, &matched_rules), &matched_rules),
+        handlers_used,
+    }
 }
 
 /// Removes tracking parameters from a given string reference that is expected to be a valid URL.
@@ -162,6 +173,14 @@ pub fn clean_str(url: &str) -> Result<String, url::ParseError> {
     let url = clean(url);
 
     Ok(url.to_string())
+}
+
+/// Same as [`clean_str`] but returns the [`Cleaned`] type
+pub fn clean_str_raw(url: &str) -> Result<Cleaned, url::ParseError> {
+    let url = Url::parse(url)?;
+    let cleaned = clean(url);
+
+    Ok(cleaned)
 }
 
 fn clean_query_string(url: Url, rules: &[&Rule]) -> Url {
