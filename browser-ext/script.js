@@ -4,11 +4,9 @@ const privacyRedirect = {
 
     ALLOWED_LIST_GLOBAL: [],
     RECENT_PROCESSES: {},
-    isFirefox: false,
 
     init: function () {
         var isExtension = false;
-        privacyRedirect.isFirefox = navigator.userAgent.indexOf("Firefox") >= 0;
         if (typeof chrome === "object" || typeof browser === "object") {
             // Browser Extension
             let inst = typeof chrome === "object" ? chrome : browser;
@@ -68,13 +66,7 @@ const privacyRedirect = {
             return {};
         }
         var url = requestDetails.url;
-        var origin = privacyRedirect.isFirefox ? requestDetails.originUrl : requestDetails.initiator;
-
-        if (!privacyRedirect.isFirefox) {
-            if (requestDetails.type != "main_frame") {
-                return {};
-            }
-        }
+        var origin = requestDetails.originUrl;
 
         if (requestDetails.documentUrl != undefined
             || (origin != undefined && origin.startsWith(privacyRedirect.SERVER))) {
