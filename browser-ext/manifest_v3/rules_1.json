@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "priority": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "regexSubstitution": "https://privacydir.com/?\\0"
+            }
+        },
+        "condition": {
+            "regexFilter": "(.*)",
+            "requestMethods": ["get"],
+            "domainType": "thirdParty",
+            "excludedRequestDomains": ["privacydir.com"],
+            "excludedInitiatorDomains": ["privacydir.com"],
+            "resourceTypes": [
+                "main_frame"
+            ]
+        }
+    }
+]

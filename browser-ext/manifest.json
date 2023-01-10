@@ -5,6 +5,7 @@
     "description": "Remove all known trackers and hide your referrer before redirecting to another site",
     "icons": {
         "48": "icon-48.png",
+        "128": "icon-128.png",
         "148": "icon.png"
     },
     "background": {
