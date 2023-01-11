@@ -17,12 +17,12 @@ use crate::{
 lazy_static::lazy_static! {
     pub(crate) static ref  GLOBAL_PARAMS: Vec<Rule> = vec![
         Rule {
-            domains: vec![Any],
+            host_path: vec![Any],
             params: UNIVERSAL_PARAMS.to_vec(),
             handler: None
         },
         Rule {
-            domains: vec![Contains("amazon")],
+            host_path: vec![Contains("amazon")],
             params: vec![
                 Exact("_encoding"),
                 Exact("creative"),
@@ -42,7 +42,12 @@ lazy_static::lazy_static! {
             handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["U"], Some(vec!["gp/r.html" ]))))
         },
         Rule {
-            domains: vec![Contains("bing")],
+            host_path: vec![Contains("track"), Contains("analytics")],
+            params: vec![],
+            handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["redir", "dest"], None)))
+        },
+        Rule {
+            host_path: vec![Contains("bing")],
             params: vec![
                 Exact("cvid"),
                 Exact("form"),
@@ -55,7 +60,7 @@ lazy_static::lazy_static! {
             handler: None
         },
         Rule {
-            domains: vec![Contains("google")],
+            host_path: vec![Contains("google")],
             params: vec![
                 Exact("cvid"),
                 Exact("ei"),
@@ -66,7 +71,7 @@ lazy_static::lazy_static! {
             handler: None
         },
         Rule {
-            domains: vec![ContainsAll(vec!["google", "/url"])],
+            host_path: vec![ContainsAll(vec!["google", "/url"])],
             params: vec![
                 Exact("usg"),
             ],
@@ -74,14 +79,14 @@ lazy_static::lazy_static! {
         },
 
         Rule {
-            domains: vec![Contains("instagram")],
+            host_path: vec![Contains("instagram")],
             params: vec![
                 Exact("igshid"),
             ],
             handler: None
         },
         Rule {
-            domains: vec![Contains("nytimes")],
+            host_path: vec![Contains("nytimes")],
             params: vec![
                 Exact("emc"),
                 Exact("partner"),
@@ -89,7 +94,7 @@ lazy_static::lazy_static! {
             handler: None
         },
         Rule {
-            domains: vec![Contains("reddit")],
+            host_path: vec![Contains("reddit")],
             params: vec![
                 Exact("context"),
                 Exact("ref"),
@@ -99,7 +104,7 @@ lazy_static::lazy_static! {
             handler: None
         },
         Rule {
-            domains: vec![Contains("twitter")],
+            host_path: vec![Contains("twitter")],
             params: vec![
                 Exact("context"),
                 Exact("vertical"),
@@ -111,7 +116,7 @@ lazy_static::lazy_static! {
             handler: None
         },
         Rule {
-            domains: vec![Contains("youtube")],
+            host_path: vec![Contains("youtube")],
             params: vec![
                 Contains("ab_channel"),
                 Contains("attr_tag"),
@@ -122,7 +127,7 @@ lazy_static::lazy_static! {
         },
         // https://community.spotify.com/t5/Desktop-Windows/si-Parameter-in-Spotify-URL-s/td-p/4538290
         Rule {
-            domains: vec![Contains("spotify")],
+            host_path: vec![Contains("spotify")],
             params: vec![
                 Exact("si")
             ],
@@ -130,7 +135,7 @@ lazy_static::lazy_static! {
         },
         // https://partnerhelp.ebay.com/helpcenter/s/article/What-are-the-parameters-of-an-EPN-link#tracking-link-format
         Rule {
-            domains: vec![Contains("ebay")],
+            host_path: vec![Contains("ebay")],
             params: vec![
                 Exact("mkevt"),
                 Exact("mkcid"),

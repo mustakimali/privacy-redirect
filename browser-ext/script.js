@@ -7,7 +7,7 @@ const privacyRedirect = {
 
     init: function () {
         var isExtension = false;
-        if (navigator.userAgent.indexOf("Firefox") >= 0 && (typeof chrome === "object" || typeof browser === "object")) {
+        if (typeof chrome === "object" || typeof browser === "object") {
             // Browser Extension
             let inst = typeof chrome === "object" ? chrome : browser;
             isExtension = true;
@@ -109,7 +109,7 @@ const privacyRedirect = {
                 privacyRedirect.ALLOWED_LIST_GLOBAL = list;
 
                 console.log("The following domains will be skipped as they are known to break due to missing referrer.: " + JSON.stringify(list));
-            }).catch(r => console.warn("[Privacy Redirect] Error updating allow list"));
+            }).catch(r => console.warn("[Privacy Redirect] Error updating allow list: "+ r));
     }
 
 };

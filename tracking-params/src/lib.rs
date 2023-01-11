@@ -22,7 +22,7 @@ mod rules;
 #[derivative(Debug)]
 pub(crate) struct Rule {
     /// List of domains for which this rule applies.
-    domains: Vec<M>,
+    host_path: Vec<M>,
     /// List of query string and fragment params to remove.
     params: Vec<M>,
     /// Handler to run any specific code for this rule.
@@ -106,19 +106,28 @@ impl M {
 ///
 
 #[derive(Debug, Clone)]
-pub struct Cleaned(Url);
+pub struct Cleaned {
+    result: Url,
+    handlers_used: i32,
+}
 
 impl std::ops::Deref for Cleaned {
     type Target = Url;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.result
+    }
+}
+
+impl Cleaned {
+    pub fn number_of_handlers_used(&self) -> i32 {
+        self.handlers_used
     }
 }
 
 impl ToString for Cleaned {
     fn to_string(&self) -> String {
-        self.0.as_ref().trim_end_matches('=').to_string()
+        self.result.as_ref().trim_end_matches('=').to_string()
     }
 }
 
@@ -126,6 +135,7 @@ impl ToString for Cleaned {
 ///
 /// This owns the input and returns a [`Cleaned`] type.
 pub fn clean(url: Url) -> Cleaned {
+    let mut handlers_used = 0;
     // Find applicable rules for this hostname
     let host_path = format!(
         "{}/{}",
@@ -134,7 +144,7 @@ pub fn clean(url: Url) -> Cleaned {
     );
     let matched_rules = rules::GLOBAL_PARAMS
         .iter()
-        .filter(|r| r.domains.iter().any(|d| d.matches_str(Some(&host_path))))
+        .filter(|r| r.host_path.iter().any(|d| d.matches_str(Some(&host_path))))
         .collect::<Vec<_>>();
 
     // Run ths url through any rules that has a handler defined
@@ -144,13 +154,14 @@ pub fn clean(url: Url) -> Cleaned {
     for rule in rules_with_handles {
         if let Some(handler) = &rule.handler {
             url = handler(url);
+            handlers_used += 1;
         }
     }
 
-    Cleaned(clean_hash_params(
-        clean_query_string(url, &matched_rules),
-        &matched_rules,
-    ))
+    Cleaned {
+        result: clean_hash_params(clean_query_string(url, &matched_rules), &matched_rules),
+        handlers_used,
+    }
 }
 
 /// Removes tracking parameters from a given string reference that is expected to be a valid URL.
@@ -162,6 +173,14 @@ pub fn clean_str(url: &str) -> Result<String, url::ParseError> {
     let url = clean(url);
 
     Ok(url.to_string())
+}
+
+/// Same as [`clean_str`] but returns the [`Cleaned`] type
+pub fn clean_str_raw(url: &str) -> Result<Cleaned, url::ParseError> {
+    let url = Url::parse(url)?;
+    let cleaned = clean(url);
+
+    Ok(cleaned)
 }
 
 fn clean_query_string(url: Url, rules: &[&Rule]) -> Url {
@@ -348,6 +367,14 @@ mod tests {
     #[test_case(
         "https://www.amazon.co.uk/gp/r.html?C=HEX&K=SOMEHEX&M=urn:rtn:msg:NUMBERS&R=SOMETHING&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fyour-account%2Forder-details%3ForderID%3DOREDER_ID%26ref_%3Dpreference&H=TEXT&ref_=pe_ref_with_underscore",
         "https://www.amazon.co.uk/gp/your-account/order-details?orderID=OREDER_ID&ref_=preference"; "amazon: extract from U"
+    )]
+    #[test_case(
+        "https://email.clearscore.com/uni/track?uid=UUID&txnid=UUID&bsft_aaid=UUID&eid=UUID&mid=UUID&bsft_ek=RANDOM&bsft_mime_type=html&bsft_tv=27&bsft_lx=9&a=click&redir=https%3A%2F%2Fapp.clearscore.com%2Freport%3Futm_campaign%3Deml_lc_ca_alerts_2021_02_09%26utm_source%3Dblueshift%26utm_medium%3Demail%26utm_content%3Deml_lc_alerts_new_template_2022_04_01",
+        "https://app.clearscore.com/report"; "generic email tracker: with track in path"
+    )]
+    #[test_case(
+        "https://t.lever-analytics.com/email-link?dest=https%3A%2F%2Fwww.wired.co.uk%2F&eid=UUID&idx=1&token=TOKEN",
+        "https://www.wired.co.uk/"; "generic email tracker: with dest in path"
     )]
     fn site_specific(input: &str, expected: &str) {
         test_common(input, expected)

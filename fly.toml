@@ -21,9 +21,9 @@ processes = []
   protocol = "tcp"
   script_checks = []
   [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
-    type = "connections"
+    hard_limit = 18000
+    soft_limit = 15000
+    type = "requests"
 
   [[services.http_checks]]
     grace_period = "5s"

@@ -32,21 +32,21 @@ const REDIRECT_HTML: &str = r#"
 <title>Privacy Redirect</title>
 <meta http-equiv="Refresh" content="0; url=$$URL$$" />
 <meta name="referrer" content="no-referrer" />
-</head>
-<body style="background-color: #000;color: #ccc;">
-<noscript>
-<p>Click to redirect:<br /><a href="$$URL$$">$$URL$$</a></p>
-</noscript>
 <script type="text/javascript">
 /* <![CDATA[ */
 window.opener = null; window.location.replace("$$URL_ESCAPED$$" + window.location.hash);
 /* ]]> */
 </script>
+</head>
+<body style="background-color: #000;color: #ccc;">
+<noscript>
+<p>Click to redirect:<br /><a href="$$URL$$">$$URL$$</a></p>
+</noscript>
 </body></html>"#;
 
 #[tracing::instrument(
     skip(req),
-    fields(cleaned = false, json = false, http.header.ip = ""))]
+    fields(cleaned = false, json = false, http.header.ip = "", used_handlers = 0))]
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     let input_url = req.query_string().to_string();
     let input_url = urlencoding::decode(&input_url)
@@ -64,7 +64,10 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     }
 
     if !input_url.is_empty() {
-        if let Ok(cleaned) = tracking_params::clean_str(&input_url) {
+        if let Ok(result) = tracking_params::clean_str_raw(&input_url) {
+            tracing::Span::current().record("used_handlers", result.number_of_handlers_used());
+
+            let cleaned = result.to_string();
             let removed_trackers = cleaned != input_url;
             tracing::Span::current().record("cleaned", removed_trackers);
 
