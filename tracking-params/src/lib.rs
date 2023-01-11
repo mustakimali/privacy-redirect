@@ -372,6 +372,10 @@ mod tests {
         "https://email.clearscore.com/uni/track?uid=UUID&txnid=UUID&bsft_aaid=UUID&eid=UUID&mid=UUID&bsft_ek=RANDOM&bsft_mime_type=html&bsft_tv=27&bsft_lx=9&a=click&redir=https%3A%2F%2Fapp.clearscore.com%2Freport%3Futm_campaign%3Deml_lc_ca_alerts_2021_02_09%26utm_source%3Dblueshift%26utm_medium%3Demail%26utm_content%3Deml_lc_alerts_new_template_2022_04_01",
         "https://app.clearscore.com/report"; "generic email tracker: with track in path"
     )]
+    #[test_case(
+        "https://t.lever-analytics.com/email-link?dest=https%3A%2F%2Fwww.wired.co.uk%2F&eid=UUID&idx=1&token=TOKEN",
+        "https://www.wired.co.uk/"; "generic email tracker: with dest in path"
+    )]
     fn site_specific(input: &str, expected: &str) {
         test_common(input, expected)
     }

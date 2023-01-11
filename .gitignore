@@ -1,3 +1,4 @@
 /target
 static/**
 browser-ext/out/**
+frontend/public/app/script.js

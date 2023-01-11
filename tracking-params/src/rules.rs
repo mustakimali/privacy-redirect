@@ -42,9 +42,9 @@ lazy_static::lazy_static! {
             handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["U"], Some(vec!["gp/r.html" ]))))
         },
         Rule {
-            host_path: vec![Contains("track")],
+            host_path: vec![Contains("track"), Contains("analytics")],
             params: vec![],
-            handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["redir"], None)))
+            handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["redir", "dest"], None)))
         },
         Rule {
             host_path: vec![Contains("bing")],
