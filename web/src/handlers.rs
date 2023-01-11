@@ -5,12 +5,15 @@ use serde_json::json;
 pub enum HttpError {
     #[error("Internal Server Error")]
     InternalServerError(#[from] anyhow::Error),
+    #[error("Forbidden")]
+    Forbidden,
 }
 
 impl actix_web::ResponseError for HttpError {
     fn status_code(&self) -> StatusCode {
         match self {
             HttpError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            HttpError::Forbidden => StatusCode::FORBIDDEN,
         }
     }
 }

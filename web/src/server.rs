@@ -85,3 +85,94 @@ async fn start_server(addr: String) -> anyhow::Result<()> {
 
     Ok(())
 }
+
+mod middleware {
+    use futures_util::future::LocalBoxFuture;
+    use std::future::{ready, Ready};
+
+    use actix_web::{
+        dev::{Service, ServiceRequest, ServiceResponse, Transform},
+        Error, FromRequest,
+    };
+
+    pub struct Timing;
+    pub struct TimingMiddleware<S> {
+        service: S,
+    }
+
+    impl<S, B> Transform<S, ServiceRequest> for Timing
+    where
+        S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+        S::Future: 'static,
+        B: 'static,
+    {
+        type Response = ServiceResponse<B>;
+        type Error = Error;
+        type InitError = ();
+        type Transform = TimingMiddleware<S>;
+        type Future = Ready<Result<Self::Transform, Self::InitError>>;
+
+        fn new_transform(&self, service: S) -> Self::Future {
+            ready(Ok(TimingMiddleware { service }))
+        }
+    }
+
+    impl<S, B> Service<ServiceRequest> for TimingMiddleware<S>
+    where
+        S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+        S::Future: 'static,
+        B: 'static,
+    {
+        type Response = ServiceResponse<B>;
+
+        type Error = Error;
+
+        type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
+
+        fn poll_ready(
+            &self,
+            ctx: &mut core::task::Context<'_>,
+        ) -> std::task::Poll<Result<(), Self::Error>> {
+            self.service.poll_ready(ctx)
+        }
+
+        fn call(&self, req: ServiceRequest) -> Self::Future {
+            let mut req = req;
+
+            let req_details = req.extract::<RequestDetails>();
+            let fut = self.service.call(req);
+
+            Box::pin(async {
+                let req_details = req_details.await?;
+                let res = fut.await?;
+
+                //let res = res.error_response(super::handlers::HttpError::Forbidden.into());
+                Ok(res)
+            })
+        }
+    }
+
+    pub struct RequestDetails {
+        pub ip_address: Option<String>,
+    }
+
+    impl FromRequest for RequestDetails {
+        type Error = Error;
+
+        type Future = Ready<Result<Self, Self::Error>>;
+
+        fn from_request(
+            req: &actix_web::HttpRequest,
+            _payload: &mut actix_web::dev::Payload,
+        ) -> Self::Future {
+            let ip_address = req
+                .headers()
+                .get("cf-connecting-ip")
+                //.ok_or_else(|| PublicRequestError::Failed)
+                .and_then(|ip| ip.to_str().ok())
+                .map(|ip| ip.to_string());
+
+            ready(Ok(Self { ip_address }))
+        }
+    }
+}
