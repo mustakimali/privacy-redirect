@@ -52,3 +52,15 @@ code, pre {
   border-radius: 10px;
   word-wrap: break-word;
 }
+
+.contentWide {
+  text-align: center;
+  padding: 15px;
+  background-color: #282c34;
+  color: #888;
+}
+.contentWide * {
+  vertical-align: middle;
+  font-size: small;
+  color: #888;
+}

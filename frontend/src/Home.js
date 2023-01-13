@@ -1,10 +1,10 @@
-import './App.css';
+import './Home.css';
 import { useEffect, useState } from "react"
 import { cleanUrl, SERVER } from './http';
 import validUrl from "valid-url"
 import getForFirefox from './get-the-addon-fx-apr-2020.svg'
 
-function App() {
+function Home() {
   const defaultUrl = "https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY";
   const [state, setState] = useState({
     url: defaultUrl,
@@ -100,17 +100,8 @@ function App() {
           </code>
         </div>
       </div >
-
-      <div className='contentWide'>
-        <span>
-          Made with 💙 and 🦀 by  <a href="https://mustak.im">Mohammad Mustakim Ali</a>
-        </span>
-        <a href="https://www.buymeacoffee.com/mustak.im" target="_blank" rel='noreferrer'>
-          <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50px" style={{ margin: "10px" }} />
-        </a>
-      </div>
     </div>
   );
 }
 
-export default App;
+export default Home;
