@@ -5,12 +5,15 @@ use serde_json::json;
 pub enum HttpError {
     #[error("Internal Server Error")]
     InternalServerError(#[from] anyhow::Error),
+    #[error("Forbidden")]
+    Forbidden,
 }
 
 impl actix_web::ResponseError for HttpError {
     fn status_code(&self) -> StatusCode {
         match self {
             HttpError::InternalServerError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            HttpError::Forbidden => StatusCode::FORBIDDEN,
         }
     }
 }
@@ -66,7 +69,7 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     if !input_url.is_empty() {
         if let Ok(result) = tracking_params::clean_str_raw(&input_url) {
             tracing::Span::current().record("used_handlers", result.number_of_handlers_used());
-            let hostname = result.host_str().unwrap_or_else(|| &input_url);
+            let hostname = result.host_str().unwrap_or(&input_url);
             let cleaned = result.to_string();
             let removed_trackers = cleaned != input_url;
             tracing::Span::current().record("cleaned", removed_trackers);
