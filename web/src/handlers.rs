@@ -29,7 +29,7 @@ const JSON_CONTENT_TYPE: &[u8] = "application/json".as_bytes();
 const REDIRECT_HTML: &str = r#"
 <!DOCTYPE html>
 <html><head>
-<title>Privacy Redirect</title>
+<title>Loading $$HOSTNAME$$</title>
 <meta http-equiv="Refresh" content="0; url=$$URL$$" />
 <meta name="referrer" content="no-referrer" />
 <script type="text/javascript">
@@ -66,7 +66,7 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     if !input_url.is_empty() {
         if let Ok(result) = tracking_params::clean_str_raw(&input_url) {
             tracing::Span::current().record("used_handlers", result.number_of_handlers_used());
-
+            let hostname = result.host_str().unwrap_or_else(|| &input_url);
             let cleaned = result.to_string();
             let removed_trackers = cleaned != input_url;
             tracing::Span::current().record("cleaned", removed_trackers);
@@ -92,6 +92,7 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
             let cleaned_escaped = cleaned.replace('/', r#"\/"#);
             let html = REDIRECT_HTML
                 .replace("$$URL$$", &cleaned)
+                .replace("$$HOSTNAME$$", hostname)
                 .replace("$$URL_ESCAPED$$", &cleaned_escaped);
             return HttpResponse::Ok()
                 .append_header(("cache-control", "public, max-age=300"))
