@@ -1658,6 +1658,7 @@ dependencies = [
  "lazy_static",
  "opentelemetry",
  "opentelemetry-otlp",
+ "paste",
  "reqwest",
  "serde_json",
  "thiserror",
