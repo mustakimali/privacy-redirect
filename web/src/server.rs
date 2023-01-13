@@ -40,7 +40,6 @@ async fn start_server(addr: String) -> anyhow::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(actix_web::middleware::Compress::default())
             .wrap(super::tracing::PrivacyFriendlyTraceLogger::new())
             .wrap(protect_endpoint_middleware::Middleware)
             .wrap(timing_cors_headers_middleware::Middleware)
