@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! create_middleware {
-    ($name: ident, $code: expr, $head: tt, $tail: tt) => {
+    ($name: ident, $code: expr) => {
         paste::paste! {
             mod [<$name:snake _middleware>] {
                 use futures_util::future::LocalBoxFuture;
@@ -8,7 +8,7 @@ macro_rules! create_middleware {
 
                 use actix_web::{
                     dev::{Service, ServiceRequest, ServiceResponse, Transform},
-                    Error, FromRequest,
+                    Error
                 };
 
                 pub struct Midleware;
@@ -53,49 +53,7 @@ macro_rules! create_middleware {
                     }
 
                     fn call(&self, req: ServiceRequest) -> Self::Future {
-                        // let mut req = req;
-
-                        // let req_details = req.extract::<RequestDetails>();
-                        // let path = req.path().to_string();
-                        // let fut = self.service.call(req);
-
-                        $head
-
-                        Box::pin(async move {
-                            // let req_details = req_details.await?;
-                            // let res = fut.await?;
-
-                            // if path == "/metrics" && dbg!(req_details.ip_address).is_some() {
-                            //     return Err(super::handlers::HttpError::Forbidden.into());
-                            // }
-
-                            $tail
-                            Ok(res)
-                        })
-                    }
-                }
-
-                pub struct RequestDetails {
-                    pub ip_address: Option<String>,
-                }
-
-                impl FromRequest for RequestDetails {
-                    type Error = Error;
-
-                    type Future = Ready<Result<Self, Self::Error>>;
-
-                    fn from_request(
-                        req: &actix_web::HttpRequest,
-                        _payload: &mut actix_web::dev::Payload,
-                    ) -> Self::Future {
-                        let ip_address = req
-                            .headers()
-                            .get("cf-connecting-ip")
-                            //.ok_or_else(|| PublicRequestError::Failed)
-                            .and_then(|ip| ip.to_str().ok())
-                            .map(|ip| ip.to_string());
-
-                        ready(Ok(Self { ip_address }))
+                        $code(self, req)
                     }
                 }
             }

@@ -75,7 +75,7 @@ async fn start_server(addr: String) -> anyhow::Result<()> {
             .wrap(prometheus.clone())
             .wrap(actix_web::middleware::Compress::default())
             .wrap(super::tracing::PrivacyFriendlyTraceLogger::new())
-            //.wrap(protect_endpoint_middleware::Midleware)
+            .wrap(protect_endpoint_middleware::Midleware)
             .service(actix_files::Files::new("/app", "./static").index_file("index.html"))
             //.wrap(ProtectEndpoint)
             .configure(register_handlers)
@@ -88,114 +88,47 @@ async fn start_server(addr: String) -> anyhow::Result<()> {
     Ok(())
 }
 
+pub struct RequestDetails {
+    pub ip_address: Option<String>,
+}
+
+impl actix_web::FromRequest for RequestDetails {
+    type Error = actix_web::Error;
+
+    type Future = futures_util::future::Ready<Result<Self, Self::Error>>;
+
+    fn from_request(
+        req: &actix_web::HttpRequest,
+        _payload: &mut actix_web::dev::Payload,
+    ) -> Self::Future {
+        let ip_address = req
+            .headers()
+            .get("cf-connecting-ip")
+            .and_then(|ip| ip.to_str().ok())
+            .map(|ip| ip.to_string());
+
+        futures_util::future::ready(Ok(Self { ip_address }))
+    }
+}
+
 create_middleware!(
     ProtectEndpoint,
-    {
+    |ctx: &MiddlewareTransform<S>, req: ServiceRequest| {
         let mut req = req;
 
-        let req_details = req.extract::<RequestDetails>();
+        let req_details = req.extract::<super::RequestDetails>();
         let path = req.path().to_string();
-    },
-    {
-        let req_details = req_details.await?;
-        let res = fut.await?;
+        let fut = ctx.service.call(req);
 
-        if path == "/metrics" && dbg!(req_details.ip_address).is_some() {
-            return Err(super::handlers::HttpError::Forbidden.into());
-        }
+        Box::pin(async move {
+            let req_details = req_details.await?;
+            let res = fut.await?;
+
+            if path == "/metrics" && req_details.ip_address.is_some() {
+                return Err(super::handlers::HttpError::Forbidden.into());
+            }
+
+            Ok(res)
+        })
     }
 );
-
-// mod middleware {
-//     use futures_util::future::LocalBoxFuture;
-//     use std::future::{ready, Ready};
-
-//     use actix_web::{
-//         dev::{Service, ServiceRequest, ServiceResponse, Transform},
-//         Error, FromRequest,
-//     };
-
-//     pub struct BlockRequestToMetricsMiddleware;
-//     pub struct Timing<S> {
-//         service: S,
-//     }
-
-//     impl<S, B> Transform<S, ServiceRequest> for BlockRequestToMetricsMiddleware
-//     where
-//         S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-//         S::Future: 'static,ProtectEndpoint
-//         B: 'static,
-//     {
-//         type Response = ServiceResponse<B>;
-//         type Error = Error;
-//         type InitError = ();
-//         type Transform = Timing<S>;
-//         type Future = Ready<Result<Self::Transform, Self::InitError>>;
-
-//         fn new_transform(&self, service: S) -> Self::Future {
-//             ready(Ok(Timing { service }))
-//         }
-//     }
-
-//     impl<S, B> Service<ServiceRequest> for Timing<S>
-//     where
-//         S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-//         S::Future: 'static,
-//         B: 'static,
-//     {
-//         type Response = ServiceResponse<B>;
-
-//         type Error = Error;
-
-//         type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
-
-//         fn poll_ready(
-//             &self,
-//             ctx: &mut core::task::Context<'_>,
-//         ) -> std::task::Poll<Result<(), Self::Error>> {
-//             self.service.poll_ready(ctx)
-//         }
-
-//         fn call(&self, req: ServiceRequest) -> Self::Future {
-//             let mut req = req;
-
-//             let req_details = req.extract::<RequestDetails>();
-//             let path = req.path().to_string();
-//             let fut = self.service.call(req);
-
-//             Box::pin(async move {
-//                 let req_details = req_details.await?;
-//                 let res = fut.await?;
-
-//                 if path == "/metrics" && dbg!(req_details.ip_address).is_some() {
-//                     return Err(super::handlers::HttpError::Forbidden.into());
-//                 }
-//                 Ok(res)
-//             })
-//         }
-//     }
-
-//     pub struct RequestDetails {
-//         pub ip_address: Option<String>,
-//     }
-
-//     impl FromRequest for RequestDetails {
-//         type Error = Error;
-
-//         type Future = Ready<Result<Self, Self::Error>>;
-
-//         fn from_request(
-//             req: &actix_web::HttpRequest,
-//             _payload: &mut actix_web::dev::Payload,
-//         ) -> Self::Future {
-//             let ip_address = req
-//                 .headers()
-//                 .get("cf-connecting-ip")
-//                 //.ok_or_else(|| PublicRequestError::Failed)
-//                 .and_then(|ip| ip.to_str().ok())
-//                 .map(|ip| ip.to_string());
-
-//             ready(Ok(Self { ip_address }))
-//         }
-//     }
-// }
