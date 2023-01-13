@@ -1,3 +1,29 @@
+/// Macro to to reduce boilerplate codes for simple actix_web middleware.
+///
+/// # Example
+/// ```rust
+/// create_middleware!(
+///     TimingHeaders,
+///     |ctx: &MiddlewareTransform<S>, req: ServiceRequest| {
+///         use actix_web::http::header::{HeaderName, HeaderValue};
+///         use chrono::Utc;
+///     
+///         let start = Utc::now();
+///     
+///         let fut = ctx.service.call(req);
+///         Box::pin(async move {
+///             let mut res = fut.await?;
+///             let duration = Utc::now() - start;
+///             res.headers_mut().insert(
+///                 HeaderName::from_static("x-app-time-ms"),
+///                 HeaderValue::from_str(&format!("{}", duration.num_milliseconds()))?,
+///             Ok(res)
+///         })
+/// );
+///
+/// // Usage
+/// App::new()::wrap(timing_headers_middleware::Middleware);
+/// ```
 #[macro_export]
 macro_rules! create_middleware {
     ($name: ident, $code: expr) => {
@@ -11,12 +37,12 @@ macro_rules! create_middleware {
                     Error
                 };
 
-                pub struct Midleware;
+                pub struct Middleware;
                 pub struct MiddlewareTransform<S> {
                     service: S,
                 }
 
-                impl<S, B> Transform<S, ServiceRequest> for Midleware
+                impl<S, B> Transform<S, ServiceRequest> for Middleware
                 where
                     S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
                     S::Future: 'static,
