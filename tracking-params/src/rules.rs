@@ -190,6 +190,7 @@ lazy_static::lazy_static! {
         Exact("WT.mc_id"),
         Exact("WT.srch"),
         Exact("yclid"),
+        Exact("ref"),
 
         StartsWith("pd_rd"),
         StartsWith("pf_rd"),
