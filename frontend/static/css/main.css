@@ -80,7 +80,7 @@ header {
     background-color: #282c34;
     color: #fff;
     font-weight: 400;
-    overflow-x: scroll;
+    overflow-x: auto;
     padding: 20px;
     text-align: left
 }
