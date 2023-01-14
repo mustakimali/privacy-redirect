@@ -49,7 +49,13 @@ window.opener = null; window.location.replace("$$URL_ESCAPED$$" + window.locatio
 
 #[tracing::instrument(
     skip(req),
-    fields(cleaned = false, json = false, http.header.ip = "", used_handlers = 0))]
+    fields(
+        cleaned = tracing::field::Empty,
+        json = false,
+        http.header.ip = tracing::field::Empty,
+        used_handlers = tracing::field::Empty
+    )
+)]
 pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
     let input_url = req.query_string().to_string();
     let input_url = urlencoding::decode(&input_url)

@@ -47,6 +47,11 @@ lazy_static::lazy_static! {
             handler: Some(Box::new(|url| extract_link_from_query_string(url, vec!["redir", "dest"], None)))
         },
         Rule {
+            host_path: vec![ContainsAll(vec!["linkedin.com", "messaging", "thread"])],
+            params: vec![AllBut("_")],
+            handler: None
+        },
+        Rule {
             host_path: vec![Contains("bing")],
             params: vec![
                 Exact("cvid"),
