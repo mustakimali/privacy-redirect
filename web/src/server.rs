@@ -44,7 +44,7 @@ async fn start_server(addr: String) -> anyhow::Result<()> {
             .wrap(protect_endpoint_middleware::Middleware)
             .wrap(timing_cors_headers_middleware::Middleware)
             .wrap(prometheus.clone())
-            .service(actix_files::Files::new("/app", "./static").index_file("index.html"))
+            .service(actix_files::Files::new("/app", "./frontend").index_file("index.html"))
             //.wrap(ProtectEndpoint)
             .configure(register_handlers)
     })
