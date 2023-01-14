@@ -1,0 +1,19 @@
+{
+    "name": "Privacy Redirect",
+    "short_name": "Remove tracker and hide your referrer while you browse the internet",
+    "icons": [
+        {
+            "src": "/app/favicons/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/app/favicons//android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#000000",
+    "background_color": "#000000",
+    "display": "standalone"
+}

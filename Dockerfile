@@ -21,17 +21,6 @@ RUN cargo test --release
 RUN cargo build --release
 RUN ls -lsah target/release
 
-FROM node:18 as frontend-builder
-WORKDIR app
-COPY frontend/package.json ./
-COPY frontend/yarn.lock ./
-RUN yarn install
-
-COPY frontend ./
-RUN yarn build
-
-RUN ls -lsah .
-
 FROM debian:bullseye-slim AS runtime
 WORKDIR app
 
@@ -41,7 +30,7 @@ ENV RUST_LOG=info
 RUN apt-get update -y && apt-get install ca-certificates -y
 
 COPY --from=builder /app/target/release/privacy-redirect /app
-COPY --from=frontend-builder /app/build /app/static
-COPY browser-ext/script.js /app/static/script.js
+COPY frontend /app/frontend
+COPY browser-ext/script.js /app/frontend/script.js
 
 ENTRYPOINT ["/app/privacy-redirect"]
