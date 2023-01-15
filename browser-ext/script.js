@@ -65,6 +65,10 @@ const privacyRedirect = {
         if (requestDetails.method !== "GET") {
             return {};
         }
+        if (requestDetails.type != "main_frame" && requestDetails.type != "sub_frame") {
+            return {};
+        }
+
         var url = requestDetails.url;
         var origin = requestDetails.originUrl;
 
