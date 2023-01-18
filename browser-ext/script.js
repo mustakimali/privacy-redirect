@@ -88,7 +88,7 @@ const privacyRedirect = {
         }
 
         // Skip processing repeated requests, it usually means redirect loop
-        if (privacyRedirect.RECENT_PROCESSES[url] != undefined) {
+        if (privacyRedirect.RECENT_PROCESSES[urlParam.origin] != undefined) {
             return {};
         }
 
@@ -96,7 +96,7 @@ const privacyRedirect = {
 
         if (url != redirected) {
             // Redirect
-            privacyRedirect.RECENT_PROCESSES[url] = true;
+            privacyRedirect.RECENT_PROCESSES[urlParam.origin] = true;
             return { redirectUrl: redirected };
         } else {
             return {};
