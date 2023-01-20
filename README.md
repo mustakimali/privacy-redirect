@@ -7,7 +7,7 @@ A web service to protect your privacy online by removing known trackers from out
 
 Protect your privacy on any website.
 
-[<img src="frontend/src/get-the-addon-fx-apr-2020.svg" height="60" />](https://addons.mozilla.org/en-US/firefox/addon/privacydir/)
+[<img src="frontend/static/media/get-the-addon-fx-apr-2020.svg" height="60" />](https://addons.mozilla.org/en-US/firefox/addon/privacydir/)
 
 
 ### For your website
