@@ -154,3 +154,7 @@ pre {
     font-size: small;
     vertical-align: middle
 }
+
+.get-ext a {
+    text-decoration: none;
+}
