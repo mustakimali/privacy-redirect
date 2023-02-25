@@ -4,7 +4,6 @@ on:
     branches:
       - main
 
-
 name: Check and Lint
 
 jobs:
@@ -14,6 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: ./build.sh
+      - run: sudo apt-get update -y && sudo apt-get install protobuf-compiler
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -46,6 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: ./build.sh
+      - run: sudo apt-get update -y && sudo apt-get install protobuf-compiler
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
