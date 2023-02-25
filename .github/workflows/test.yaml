@@ -13,7 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: ./build.sh
-      - run: sudo apt-get update -y && sudo apt-get install protobuf-compiler
       - name: Cache dependencies
         uses: actions/cache@v2
         env:
