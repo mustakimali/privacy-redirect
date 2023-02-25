@@ -32,7 +32,7 @@ const JSON_CONTENT_TYPE: &[u8] = "application/json".as_bytes();
 const REDIRECT_HTML: &str = r#"
 <!DOCTYPE html>
 <html><head>
-<title>Loading $$HOSTNAME$$</title>
+<title>$$HOSTNAME$$...</title>
 <meta http-equiv="Refresh" content="0; url=$$URL$$" />
 <meta name="referrer" content="no-referrer" />
 <script type="text/javascript">
