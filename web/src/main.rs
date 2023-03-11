@@ -5,7 +5,7 @@ mod tracing;
 
 lazy_static::lazy_static! {
     pub(crate) static ref ALLOWED_LIST: Vec<&'static str> = vec![
-        "okta.com", "aws.amazon.com"
+        "okta.com", "aws.amazon.com", "amazonaws.com"
     ];
 }
 
