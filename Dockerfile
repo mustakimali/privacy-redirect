@@ -1,4 +1,5 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.67 AS chef
+FROM rust:1.68 as chef
+RUN cargo install cargo-chef
 RUN apt-get update -y && apt-get install protobuf-compiler -y
 WORKDIR /app
 
