@@ -55,3 +55,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features
           name: Clippy Output
+
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker build -f Dockerfile .
