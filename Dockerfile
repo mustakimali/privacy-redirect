@@ -1,14 +1,15 @@
 FROM rust:1.68.2 AS base
 RUN cargo install cargo-chef
+RUN apt-get update -y && apt-get install protobuf-compiler -y
 WORKDIR app
 
 FROM base AS planner
 COPY . .
-RUN cargo base prepare --recipe-path recipe.json
+RUN cargo chef prepare --recipe-path recipe.json
 
 FROM base AS builder
 COPY --from=planner /app/recipe.json recipe.json
-RUN cargo base cook --release --recipe-path recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
 
 ENV SQLX_OFFLINE true
 RUN cargo build --release
