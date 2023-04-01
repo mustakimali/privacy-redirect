@@ -25,7 +25,7 @@ docker rmi mustakimali/privacy-redirect:latest
 
 echo "Tagged mustakimali/privacy-redirect:$dock_version"
 
-kubectl -n privacy-redirect set image deployments/privacy-redirect privacy-redirect=mustakimali/privacy:redirect-${dock_version}
+kubectl -n privacy-redirect set image deployments/privacy-redirect privacy-redirect=mustakimali/privacy-redirect:${dock_version}
 kubectl -n privacy-redirect rollout status deployments/privacy-redirect -w
 
 echo "Version: $dock_version"
