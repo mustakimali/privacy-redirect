@@ -1,6 +1,8 @@
 use actix_web::{http::StatusCode, HttpResponse, Responder};
 use serde_json::json;
 
+const BLOCKED: [&str; 1] = ["peculatemusic.com"];
+
 #[derive(thiserror::Error, Debug)]
 pub enum HttpError {
     #[error("Internal Server Error")]
@@ -79,6 +81,14 @@ pub async fn redirect(req: actix_web::HttpRequest) -> impl Responder {
             let cleaned = result.to_string();
             let removed_trackers = cleaned != input_url;
             tracing::Span::current().record("cleaned", removed_trackers);
+
+            if BLOCKED.iter().any(|i| input_url.contains(i)) {
+                tracing::Span::current().record("blocked", true);
+                return HttpResponse::Forbidden()
+                    .append_header(("cache-control", "public, max-age=300"))
+                    .append_header(("content-type", "text/html; charset=utf-8"))
+                    .body("<h1>This URL has been blocked for your safety</h1>");
+            }
 
             if let Some(ct) = req.headers().get("content-type") {
                 if ct
