@@ -14,7 +14,8 @@
 </head>
 
 <body>
-    <div id="root" x-data="{ origin: window.location.origin, url: 'https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY', cleaned: '', json: ''}">
+    <div id="root"
+        x-data="{ origin: window.location.origin, url: 'https://twitter.com/elonmusk/status/1608273870901096454?ref_src=twsrc%5EdUmBgUY', cleaned: '', json: ''}">
         <div class="App">
             <header class="App-header">
                 <h1>Privacy Redirect</h1>
@@ -23,19 +24,25 @@
             <div class="content">
                 <div class="panel">
                     <p>
-                        Removes all known trackers and hide your referrer before redirecting your visitor to another site.
+                        Removes all known trackers and hide your referrer before redirecting your visitor to another
+                        site.
                     </p>
                     <div class="get-ext">
                         <a href="https://addons.mozilla.org/en-US/firefox/addon/privacydir/">
-                            <img src="/app/static/media/get-the-addon-fx-apr-2020.svg" alt="Get Firefox Addon" width="150px">
+                            <img src="/app/static/media/get-the-addon-fx-apr-2020.svg" alt="Get Firefox Addon"
+                                width="150px">
                         </a>
 
-                        <a href="https://chrome.google.com/webstore/detail/privacy-redirect/lhemfcjadpgnjpcplhcgmpbicbkbbdpe">
+                        <a
+                            href="https://chrome.google.com/webstore/detail/privacy-redirect/lhemfcjadpgnjpcplhcgmpbicbkbbdpe">
                             <img src="/app/static/media/chrome.png" alt="Get Chrome Extension" height="52px">
                         </a>
                     </div>
                     <div style="font-size: small;">
-                        <a href="#for-your-website">Installation instruction for own your website</a> &middot; <a href="/app/privacy-policy.html">Privacy Policy</a>
+                        <a href="#for-your-website">Installation instruction for own your website</a> &middot; <a
+                            href="/app/privacy-policy.html">Privacy Policy</a> &middot; <a
+                            style="color: red; text-decoration: none;" href="https://forms.gle/Awk813kjEzhr4FJG6">👿
+                            Report Spam</a>
                     </div>
                     <h2>How does it work?</h2>
                     <p>Simply prefix the link with <code x-text="origin + '/?'"></code></p>
@@ -45,17 +52,19 @@
                         <div style="font-size: x-large;">
                             <p>
                                 <a :href="origin + '/?' + url" target="_blank" class="previewLink" rel="noreferrer">
-                                <span id="host" x-text="origin + '/' "></span>?
-                                <span id="orgUrl" x-html="url"></span></a>
+                                    <span id="host" x-text="origin + '/' "></span>?
+                                    <span id="orgUrl" x-html="url"></span></a>
                             </p>
                         </div>
-                        
-                        Redirects to cleaned link by <a href="https://whatsmyreferer.com/?utm_source=privacy-redirect">hiding your referrer</a>:
+
+                        Redirects to cleaned link by <a
+                            href="https://whatsmyreferer.com/?utm_source=privacy-redirect">hiding your referrer</a>:
                         <br><br>
                         <input type="text" placeholder="Cleaned link will appear hear" readonly="" :value="cleaned" />
                     </form>
                     <div>
-                        <small>If you specify <code>Content-Type: application/json</code> then you get a json response.</small>
+                        <small>If you specify <code>Content-Type: application/json</code> then you get a json
+                            response.</small>
                         <pre class="preview" x-html="json"></pre>
                     </div>
                 </div>
@@ -68,7 +77,8 @@
             <div class="contentWide">
                 <span>Made with 💙 and 🦀 by <a href="https://mustak.im">Mohammad Mustakim Ali</a></span>
                 <a href="https://www.buymeacoffee.com/mustak.im" target="_blank" rel="noreferrer">
-                    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="margin: 10px;" height="50px">
+                    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee"
+                        style="margin: 10px;" height="50px">
                 </a>
             </div>
         </div>
@@ -76,12 +86,12 @@
     <script type="text/javascript" src="/app/script.js"></script>
     <script>
         function update(data) {
-            fetch(`/?${data.url}`, {headers: {"content-type": "application/json"}})
-            .then(r => r.json())
-            .then(d => {
-                data.json = JSON.stringify(d, null, 4);
-                data.cleaned = d.cleaned_url;
-            });
+            fetch(`/?${data.url}`, { headers: { "content-type": "application/json" } })
+                .then(r => r.json())
+                .then(d => {
+                    data.json = JSON.stringify(d, null, 4);
+                    data.cleaned = d.cleaned_url;
+                });
         }
     </script>
 </body>
