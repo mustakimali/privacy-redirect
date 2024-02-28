@@ -1,4 +1,4 @@
-FROM rust:1.68 as chef
+FROM rust:1.73 as chef
 RUN cargo install cargo-chef
 RUN apt-get update -y && apt-get install protobuf-compiler -y
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN cargo test --release
 RUN cargo build --release
 RUN ls -lsah target/release
 
-FROM debian:bullseye-slim AS runtime
+FROM debian:bookworm AS runtime
 WORKDIR app
 
 ENV TZ=Etc/UTC
