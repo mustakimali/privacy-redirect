@@ -5,7 +5,7 @@ use actix_web::{
 use actix_web_prometheus::PrometheusMetricsBuilder;
 use tracing::info;
 
-use crate::{create_middleware, handlers};
+use crate::handlers;
 
 pub(crate) async fn start() -> anyhow::Result<()> {
     let addr = if cfg!(debug_assertions) {
@@ -79,7 +79,7 @@ impl actix_web::FromRequest for RequestDetails {
     }
 }
 
-create_middleware!(
+actix_middleware_macro::create_middleware!(
     ProtectEndpoint,
     |ctx: &MiddlewareTransform<S>, req: ServiceRequest| {
         let mut req = req;
@@ -101,7 +101,7 @@ create_middleware!(
     }
 );
 
-create_middleware!(
+actix_middleware_macro::create_middleware!(
     TimingCorsHeaders,
     |ctx: &MiddlewareTransform<S>, req: ServiceRequest| {
         use actix_web::http::header::{HeaderName, HeaderValue};

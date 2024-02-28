@@ -1,5 +1,4 @@
 mod handlers;
-mod middleware;
 mod server;
 mod tracing;
 
