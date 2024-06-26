@@ -5,6 +5,8 @@ A web service to protect your privacy online by removing known trackers from out
 ## How to Use?
 ### For your browser
 
+> ⚠️ The project is no longer live; feel free to self-host if you want to use this.
+
 Protect your privacy on any website.
 
 [<img src="frontend/static/media/get-the-addon-fx-apr-2020.svg" height="60" />](https://addons.mozilla.org/en-US/firefox/addon/privacydir/)
@@ -33,9 +35,6 @@ Please send PR to:
 If a site is broken then it's likely because it depends on the referrer to function properly (what a nightmare!). In this case you can add this domain to the global allow list [here](web/src/main.rs#L10). In the future this list can be managed from the extension itself.
 
 Please create a new issue in Github or submit your feedback using [this form](https://forms.gle/xd5XFT6JHRTvvwqY6).
-
-[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="60" />](https://www.buymeacoffee.com/mustak.im)
-
 
 ## Notes on Privacy
 This service is meant to protect- not invade your privacy. It doesn't track your browsing history. The source code is public as a proof.
